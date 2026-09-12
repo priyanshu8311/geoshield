@@ -1,0 +1,57 @@
+[
+  {
+    "relocation_site_id": "R001",
+    "capacity_score": 88.5,
+    "capacity_status": "SUFFICIENT",
+    "available_capacity": 3800,
+    "water_status": "SUFFICIENT",
+    "housing_status": "SUFFICIENT",
+    "healthcare_status": "SUFFICIENT",
+    "road_status": "SUFFICIENT",
+    "assessment_date": "2024-01-15T10:00:00Z"
+  },
+  {
+    "relocation_site_id": "R002",
+    "capacity_score": 62.0,
+    "capacity_status": "LIMITED",
+    "available_capacity": 700,
+    "water_status": "LIMITED",
+    "housing_status": "LIMITED",
+    "healthcare_status": "LIMITED",
+    "road_status": "SUFFICIENT",
+    "assessment_date": "2024-01-15T10:00:00Z"
+  },
+  {
+    "relocation_site_id": "R003",
+    "capacity_score": 85.0,
+    "capacity_status": "SUFFICIENT",
+    "available_capacity": 3500,
+    "water_status": "SUFFICIENT",
+    "housing_status": "SUFFICIENT",
+    "healthcare_status": "SUFFICIENT",
+    "road_status": "LIMITED",
+    "assessment_date": "2024-01-15T10:00:00Z"
+  },
+  {
+    "relocation_site_id": "R004",
+    "capacity_score": 78.0,
+    "capacity_status": "SUFFICIENT",
+    "available_capacity": 1700,
+    "water_status": "SUFFICIENT",
+    "housing_status": "SUFFICIENT",
+    "healthcare_status": "LIMITED",
+    "road_status": "SUFFICIENT",
+    "assessment_date": "2024-01-15T10:00:00Z"
+  },
+  {
+    "relocation_site_id": "R005",
+    "capacity_score": 55.0,
+    "capacity_status": "LIMITED",
+    "available_capacity": 500,
+    "water_status": "SUFFICIENT",
+    "housing_status": "LIMITED",
+    "healthcare_status": "LIMITED",
+    "road_status": "LIMITED",
+    "assessment_date": "2024-01-15T10:00:00Z"
+  }
+]

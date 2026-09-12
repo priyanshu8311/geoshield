@@ -1,0 +1,298 @@
+[
+  {
+    "habitation_id": "H001",
+    "hazard_score": 92.5,
+    "exposure_score": 88.0,
+    "vulnerability_score": 85.0,
+    "risk_score": 89.0,
+    "risk_level": "CRITICAL",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "High landslide susceptibility due to steep slopes and loose soil",
+      "High population exposure in hazard zone",
+      "Steep terrain with >45 degree slopes",
+      "Poor road accessibility for evacuation",
+      "Limited healthcare facilities within 50km",
+      "Historical landslide events every monsoon since 2010"
+    ]
+  },
+  {
+    "habitation_id": "H002",
+    "hazard_score": 85.0,
+    "exposure_score": 90.0,
+    "vulnerability_score": 78.0,
+    "risk_score": 84.5,
+    "risk_level": "HIGH",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Located in active floodplain",
+      "High population density near river",
+      "Annual flooding during monsoon season",
+      "Inadequate flood protection infrastructure",
+      "Limited elevated evacuation routes"
+    ]
+  },
+  {
+    "habitation_id": "H003",
+    "hazard_score": 78.0,
+    "exposure_score": 72.0,
+    "vulnerability_score": 80.0,
+    "risk_score": 76.5,
+    "risk_level": "HIGH",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Moderate landslide susceptibility",
+      "Vulnerable housing construction",
+      "Seasonal road access limitations",
+      "Single healthcare access point 40km away"
+    ]
+  },
+  {
+    "habitation_id": "H004",
+    "hazard_score": 82.0,
+    "exposure_score": 85.0,
+    "vulnerability_score": 75.0,
+    "risk_score": 81.0,
+    "risk_level": "HIGH",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Active coastal erosion at 1.5m/year",
+      "Saline groundwater affecting health",
+      "Cyclone exposure with storm surge risk",
+      "Fishing community with limited alternative livelihoods"
+    ]
+  },
+  {
+    "habitation_id": "H005",
+    "hazard_score": 88.0,
+    "exposure_score": 75.0,
+    "vulnerability_score": 82.0,
+    "risk_score": 82.0,
+    "risk_level": "HIGH",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Cloudburst corridor with flash flood risk",
+      "Very poor road access - footpath only",
+      "No healthcare facilities in vicinity",
+      "Limited early warning system coverage",
+      "Steep valley topology channels flood water"
+    ]
+  },
+  {
+    "habitation_id": "H006",
+    "hazard_score": 65.0,
+    "exposure_score": 70.0,
+    "vulnerability_score": 60.0,
+    "risk_score": 65.0,
+    "risk_level": "ELEVATED",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Moderate flood risk in floodplain",
+      "Good infrastructure reduces vulnerability",
+      "Multiple evacuation routes available",
+      "Adequate healthcare and emergency services"
+    ]
+  },
+  {
+    "habitation_id": "H007",
+    "hazard_score": 72.0,
+    "exposure_score": 68.0,
+    "vulnerability_score": 70.0,
+    "risk_score": 70.0,
+    "risk_level": "ELEVATED",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Moderate landslide risk on slopes",
+      "Aging housing stock vulnerable to ground movement",
+      "Single access road prone to blockage"
+    ]
+  },
+  {
+    "habitation_id": "H008",
+    "hazard_score": 85.0,
+    "exposure_score": 65.0,
+    "vulnerability_score": 78.0,
+    "risk_score": 76.0,
+    "risk_level": "HIGH",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "High landslide susceptibility on escarpment",
+      "No motorable road access",
+      "No healthcare or school facilities",
+      "Seismic zone - earthquake triggered landslide risk"
+    ]
+  },
+  {
+    "habitation_id": "H009",
+    "hazard_score": 75.0,
+    "exposure_score": 82.0,
+    "vulnerability_score": 68.0,
+    "risk_score": 75.0,
+    "risk_level": "ELEVATED",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Floodplain location with seasonal inundation",
+      "High population exposure",
+      "Reasonable infrastructure mitigates vulnerability"
+    ]
+  },
+  {
+    "habitation_id": "H010",
+    "hazard_score": 80.0,
+    "exposure_score": 70.0,
+    "vulnerability_score": 75.0,
+    "risk_score": 75.0,
+    "risk_level": "ELEVATED",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "High altitude cloudburst risk",
+      "Difficult terrain delays emergency response",
+      "Limited communication infrastructure"
+    ]
+  },
+  {
+    "habitation_id": "H011",
+    "hazard_score": 70.0,
+    "exposure_score": 78.0,
+    "vulnerability_score": 65.0,
+    "risk_score": 71.0,
+    "risk_level": "ELEVATED",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Coastal erosion threat to habitations",
+      "Saltwater intrusion contaminates water supply",
+      "Moderate infrastructure provides some resilience"
+    ]
+  },
+  {
+    "habitation_id": "H012",
+    "hazard_score": 90.0,
+    "exposure_score": 60.0,
+    "vulnerability_score": 85.0,
+    "risk_score": 78.5,
+    "risk_level": "HIGH",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Very high landslide susceptibility",
+      "Extremely poor infrastructure",
+      "No road access - isolated community",
+      "No healthcare or education facilities",
+      "Small population but extremely vulnerable"
+    ]
+  },
+  {
+    "habitation_id": "H013",
+    "hazard_score": 55.0,
+    "exposure_score": 65.0,
+    "vulnerability_score": 50.0,
+    "risk_score": 56.5,
+    "risk_level": "MODERATE",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Low-moderate flood risk",
+      "Excellent infrastructure and services",
+      "Good evacuation routes and emergency access"
+    ]
+  },
+  {
+    "habitation_id": "H014",
+    "hazard_score": 68.0,
+    "exposure_score": 62.0,
+    "vulnerability_score": 65.0,
+    "risk_score": 65.0,
+    "risk_level": "ELEVATED",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Moderate landslide risk on terraced slopes",
+      "Seasonal road access issues",
+      "Aging population with limited mobility"
+    ]
+  },
+  {
+    "habitation_id": "H015",
+    "hazard_score": 85.0,
+    "exposure_score": 68.0,
+    "vulnerability_score": 80.0,
+    "risk_score": 78.0,
+    "risk_level": "HIGH",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Cloudburst flash flood risk",
+      "Poor infrastructure and access",
+      "Vulnerable housing construction"
+    ]
+  },
+  {
+    "habitation_id": "H016",
+    "hazard_score": 88.0,
+    "exposure_score": 85.0,
+    "vulnerability_score": 82.0,
+    "risk_score": 85.0,
+    "risk_level": "CRITICAL",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Critical coastal erosion rate >2m/year",
+      "High population density at shoreline",
+      "Storm surge and cyclone exposure",
+      "Brackish groundwater, failing sanitation",
+      "Immediate relocation planning required"
+    ]
+  },
+  {
+    "habitation_id": "H017",
+    "hazard_score": 35.0,
+    "exposure_score": 45.0,
+    "vulnerability_score": 30.0,
+    "risk_score": 36.5,
+    "risk_level": "LOW",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Low flood risk - elevated location",
+      "Excellent infrastructure and services",
+      "Multiple healthcare and education facilities",
+      "High coping capacity and resilience"
+    ]
+  },
+  {
+    "habitation_id": "H018",
+    "hazard_score": 28.0,
+    "exposure_score": 40.0,
+    "vulnerability_score": 25.0,
+    "risk_score": 31.0,
+    "risk_level": "LOW",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Minimal landslide risk - stable geology",
+      "Excellent connectivity and services",
+      "High adaptive capacity"
+    ]
+  },
+  {
+    "habitation_id": "H019",
+    "hazard_score": 42.0,
+    "exposure_score": 50.0,
+    "vulnerability_score": 38.0,
+    "risk_score": 43.5,
+    "risk_level": "MODERATE",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Low-moderate flood risk",
+      "Good infrastructure reduces vulnerability",
+      "Adequate emergency services"
+    ]
+  },
+  {
+    "habitation_id": "H020",
+    "hazard_score": 48.0,
+    "exposure_score": 52.0,
+    "vulnerability_score": 45.0,
+    "risk_score": 48.5,
+    "risk_level": "MODERATE",
+    "assessment_date": "2024-01-15T10:00:00Z",
+    "contributing_factors": [
+      "Low-moderate landslide risk on gentle slopes",
+      "Fair infrastructure and access",
+      "Monitoring recommended for slope stability"
+    ]
+  }
+]

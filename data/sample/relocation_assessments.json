@@ -1,0 +1,202 @@
+[
+  {
+    "habitation_id": "H001",
+    "relocation_site_id": "R001",
+    "priority_score": 95.0,
+    "priority_level": "P1",
+    "distance_km": 12.5,
+    "capacity_available": 3800,
+    "recommendation": "Immediate relocation planning - Critical landslide risk",
+    "reasoning": "Habitation H001 (Valley View) has CRITICAL risk score of 89.0 due to very high landslide susceptibility, steep terrain, and poor accessibility. R001 (Safe Valley) has sufficient capacity (3800) and is 12.5km away with good road connectivity. Immediate planning required before monsoon season."
+  },
+  {
+    "habitation_id": "H002",
+    "relocation_site_id": "R001",
+    "priority_score": 92.0,
+    "priority_level": "P1",
+    "distance_km": 8.2,
+    "capacity_available": 3800,
+    "recommendation": "Immediate relocation planning - High flood risk",
+    "reasoning": "Habitation H002 (Riverside Colony) has HIGH risk score of 84.5 from annual flooding. R001 is closest at 8.2km with good NH access and sufficient capacity. Relocation should be prioritized before monsoon."
+  },
+  {
+    "habitation_id": "H016",
+    "relocation_site_id": "R004",
+    "priority_score": 94.0,
+    "priority_level": "P1",
+    "distance_km": 15.0,
+    "capacity_available": 1700,
+    "recommendation": "Immediate relocation planning - Critical coastal erosion",
+    "reasoning": "Habitation H016 (Shoreline Basti) has CRITICAL risk score of 85.0 with coastal erosion >2m/year. R004 (Coastal Safe Zone) is 15km away with sea wall protection and 1700 capacity. Urgent action needed."
+  },
+  {
+    "habitation_id": "H005",
+    "relocation_site_id": "R003",
+    "priority_score": 88.0,
+    "priority_level": "P1",
+    "distance_km": 18.5,
+    "capacity_available": 3500,
+    "recommendation": "Immediate relocation planning - Cloudburst flash flood risk",
+    "reasoning": "Habitation H005 (Cloudburst Valley) has HIGH risk score of 82.0 with very poor access. R003 (Highland Refuge) has 3500 capacity and stable terrain. Distance is greater but safety justifies relocation."
+  },
+  {
+    "habitation_id": "H003",
+    "relocation_site_id": "R003",
+    "priority_score": 78.0,
+    "priority_level": "P2",
+    "distance_km": 6.8,
+    "capacity_available": 3500,
+    "recommendation": "High priority relocation - Landslide risk",
+    "reasoning": "Habitation H003 (Hilltop Village) has HIGH risk score of 76.5. R003 is closest at 6.8km with sufficient capacity. Plan relocation within 6 months."
+  },
+  {
+    "habitation_id": "H004",
+    "relocation_site_id": "R004",
+    "priority_score": 82.0,
+    "priority_level": "P2",
+    "distance_km": 22.0,
+    "capacity_available": 1700,
+    "recommendation": "High priority relocation - Coastal erosion",
+    "reasoning": "Habitation H004 (Coastal Hamlet) has HIGH risk score of 81.0. R004 offers protected coastal location. Monitor erosion rate; plan within 12 months."
+  },
+  {
+    "habitation_id": "H008",
+    "relocation_site_id": "R003",
+    "priority_score": 75.0,
+    "priority_level": "P2",
+    "distance_km": 10.5,
+    "capacity_available": 3500,
+    "recommendation": "High priority relocation - Isolated high-risk community",
+    "reasoning": "Habitation H008 (Pine Ridge) has HIGH risk score of 76.0 with no road access. R003 provides connectivity and services. Requires road construction for relocation access."
+  },
+  {
+    "habitation_id": "H012",
+    "relocation_site_id": "R003",
+    "priority_score": 80.0,
+    "priority_level": "P2",
+    "distance_km": 14.2,
+    "capacity_available": 3500,
+    "recommendation": "High priority relocation - Extreme vulnerability",
+    "reasoning": "Habitation H012 (Boulder Creek) has HIGH risk score of 78.5 with extreme vulnerability (no roads, healthcare, schools). R003 offers comprehensive services. Priority due to vulnerability."
+  },
+  {
+    "habitation_id": "H015",
+    "relocation_site_id": "R003",
+    "priority_score": 77.0,
+    "priority_level": "P2",
+    "distance_km": 16.8,
+    "capacity_available": 3500,
+    "recommendation": "High priority relocation - Cloudburst risk",
+    "reasoning": "Habitation H015 (Monsoon Reach) has HIGH risk score of 78.0. R003 provides stable highland location. Plan within 12 months."
+  },
+  {
+    "habitation_id": "H007",
+    "relocation_site_id": "R001",
+    "priority_score": 68.0,
+    "priority_level": "P3",
+    "distance_km": 9.5,
+    "capacity_available": 3800,
+    "recommendation": "Planned relocation - Moderate landslide risk",
+    "reasoning": "Habitation H007 (Sunrise Settlement) has ELEVATED risk score of 70.0. R001 has capacity. Plan relocation in 2-3 years with community consultation."
+  },
+  {
+    "habitation_id": "H009",
+    "relocation_site_id": "R002",
+    "priority_score": 65.0,
+    "priority_level": "P3",
+    "distance_km": 5.2,
+    "capacity_available": 700,
+    "recommendation": "Planned relocation - Floodplain community",
+    "reasoning": "Habitation H009 (Delta Plains) has ELEVATED risk score of 75.0. R002 is closest but has limited capacity (700). Consider phased relocation or capacity expansion at R002."
+  },
+  {
+    "habitation_id": "H010",
+    "relocation_site_id": "R003",
+    "priority_score": 67.0,
+    "priority_level": "P3",
+    "distance_km": 12.0,
+    "capacity_available": 3500,
+    "recommendation": "Planned relocation - Cloudburst monitoring",
+    "reasoning": "Habitation H010 (Misty Heights) has ELEVATED risk score of 75.0. R003 has capacity. Monitor cloudburst frequency; plan relocation in 3-5 years."
+  },
+  {
+    "habitation_id": "H011",
+    "relocation_site_id": "R004",
+    "priority_score": 62.0,
+    "priority_level": "P3",
+    "distance_km": 18.5,
+    "capacity_available": 1700,
+    "recommendation": "Planned relocation - Coastal monitoring",
+    "reasoning": "Habitation H011 (Seaview Point) has ELEVATED risk score of 71.0. R004 is protected. Monitor erosion; plan if rate accelerates."
+  },
+  {
+    "habitation_id": "H014",
+    "relocation_site_id": "R001",
+    "priority_score": 58.0,
+    "priority_level": "P3",
+    "distance_km": 11.2,
+    "capacity_available": 3800,
+    "recommendation": "Planned relocation - Slope stability monitoring",
+    "reasoning": "Habitation H014 (Terrace Gardens) has ELEVATED risk score of 65.0. R001 has capacity. Annual slope monitoring recommended; plan if instability increases."
+  },
+  {
+    "habitation_id": "H006",
+    "relocation_site_id": "R002",
+    "priority_score": 45.0,
+    "priority_level": "P4",
+    "distance_km": 3.8,
+    "capacity_available": 700,
+    "recommendation": "Monitor - Flood risk manageable with current infrastructure",
+    "reasoning": "Habitation H006 (Green Meadows) has ELEVATED risk score of 65.0 but good infrastructure. R002 has limited capacity. No immediate relocation needed; maintain flood preparedness."
+  },
+  {
+    "habitation_id": "H013",
+    "relocation_site_id": "R002",
+    "priority_score": 35.0,
+    "priority_level": "P4",
+    "distance_km": 4.5,
+    "capacity_available": 700,
+    "recommendation": "Monitor - Low risk, excellent infrastructure",
+    "reasoning": "Habitation H013 (Fertile Fields) has MODERATE risk score of 56.5 with excellent infrastructure. No relocation needed; continue monitoring."
+  },
+  {
+    "habitation_id": "H017",
+    "relocation_site_id": "R001",
+    "priority_score": 20.0,
+    "priority_level": "P4",
+    "distance_km": 2.1,
+    "capacity_available": 3800,
+    "recommendation": "Monitor - Very low risk",
+    "reasoning": "Habitation H017 (Safe Haven) has LOW risk score of 36.5. No relocation needed. Serves as potential receiving community."
+  },
+  {
+    "habitation_id": "H018",
+    "relocation_site_id": "R001",
+    "priority_score": 18.0,
+    "priority_level": "P4",
+    "distance_km": 3.5,
+    "capacity_available": 3800,
+    "recommendation": "Monitor - Very low risk",
+    "reasoning": "Habitation H018 (Stable Ground) has LOW risk score of 31.0. No relocation needed. Stable geology and excellent services."
+  },
+  {
+    "habitation_id": "H019",
+    "relocation_site_id": "R002",
+    "priority_score": 38.0,
+    "priority_level": "P4",
+    "distance_km": 2.8,
+    "capacity_available": 700,
+    "recommendation": "Monitor - Low-moderate risk",
+    "reasoning": "Habitation H019 (Calm Waters) has MODERATE risk score of 43.5. Good infrastructure. Monitor flood patterns; no relocation needed."
+  },
+  {
+    "habitation_id": "H020",
+    "relocation_site_id": "R001",
+    "priority_score": 42.0,
+    "priority_level": "P4",
+    "distance_km": 7.2,
+    "capacity_available": 3800,
+    "recommendation": "Monitor - Slope stability watch",
+    "reasoning": "Habitation H020 (Tranquil Slopes) has MODERATE risk score of 48.5. Annual slope monitoring recommended. No immediate relocation needed."
+  }
+]

@@ -1,0 +1,225 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "HZ001",
+      "properties": {
+        "id": "HZ001",
+        "name": "North Ridge Landslide Zone",
+        "hazard_type": "Landslide",
+        "severity": 90.0,
+        "frequency": "High - Monsoon season annually",
+        "description": "Steep slopes with loose soil composition. Historical landslide events recorded every monsoon season since 2010. High risk to habitations H001, H003, H007, H008, H012, H014."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [77.98, 30.34],
+          [78.02, 30.34],
+          [78.02, 30.38],
+          [77.98, 30.38],
+          [77.98, 30.34]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ002",
+      "properties": {
+        "id": "HZ002",
+        "name": "River Basin Flood Zone",
+        "hazard_type": "Flood",
+        "severity": 85.0,
+        "frequency": "Annual - Peak monsoon (Jul-Sep)",
+        "description": "Low-lying river basin prone to seasonal flooding. River overflow affects habitations H002, H006, H009, H013, H017, H019. Flood depth can reach 2-3 meters during extreme events."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [78.03, 30.28],
+          [78.08, 30.28],
+          [78.08, 30.32],
+          [78.03, 30.32],
+          [78.03, 30.28]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ003",
+      "properties": {
+        "id": "HZ003",
+        "name": "Upper Valley Cloudburst Corridor",
+        "hazard_type": "Cloudburst",
+        "severity": 88.0,
+        "frequency": "Episodic - 2-3 events per decade",
+        "description": "Orographic cloudburst zone in upper valley. Intense localized rainfall (>100mm/hr) causes flash floods. Affects habitations H005, H010, H015. Limited early warning time."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [77.98, 30.35],
+          [78.02, 30.35],
+          [78.02, 30.375],
+          [77.98, 30.375],
+          [77.98, 30.35]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ004",
+      "properties": {
+        "id": "HZ004",
+        "name": "Eastern Coastal Erosion Belt",
+        "hazard_type": "Coastal Erosion",
+        "severity": 82.0,
+        "frequency": "Continuous - Accelerated during cyclones",
+        "description": "Active coastal erosion zone with shoreline retreat of 1-2m/year. Cyclone events accelerate erosion. Threatens habitations H004, H011, H016. Saltwater intrusion affects groundwater."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [78.07, 30.26],
+          [78.11, 30.26],
+          [78.11, 0.30],
+          [78.07, 30.30],
+          [78.07, 30.26]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ005",
+      "properties": {
+        "id": "HZ005",
+        "name": "Western Slope Instability Zone",
+        "hazard_type": "Landslide",
+        "severity": 75.0,
+        "frequency": "Moderate - Heavy rainfall events",
+        "description": "Moderate slope instability with weathered rock. Rockfall and debris flow risk during intense rainfall. Proximity to habitations H003, H007, H014, H020."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [78.00, 30.32],
+          [78.04, 30.32],
+          [78.04, 30.36],
+          [78.00, 30.36],
+          [78.00, 30.32]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ006",
+      "properties": {
+        "id": "HZ006",
+        "name": "Central Floodplain",
+        "hazard_type": "Flood",
+        "severity": 70.0,
+        "frequency": "Seasonal - Monsoon months",
+        "description": "Broad floodplain with moderate flood risk. Agricultural land use provides some buffer. Affects habitations H006, H009, H013, H019. Drainage infrastructure partially mitigates risk."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [78.04, 30.29],
+          [78.07, 30.29],
+          [78.07, 30.31],
+          [78.04, 30.31],
+          [78.04, 30.29]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ007",
+      "properties": {
+        "id": "HZ007",
+        "name": "High Altitude Cloudburst Zone",
+        "hazard_type": "Cloudburst",
+        "severity": 80.0,
+        "frequency": "Rare - 1-2 events per decade",
+        "description": "High altitude cloudburst prone area. Rapid snowmelt combined with intense rainfall causes destructive flash floods. Impacts H010, H015. Difficult access for emergency response."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [77.97, 30.36],
+          [78.01, 30.36],
+          [78.01, 30.38],
+          [77.97, 30.38],
+          [77.97, 30.36]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ008",
+      "properties": {
+        "id": "HZ008",
+        "name": "Southern Coastal Vulnerability Zone",
+        "hazard_type": "Coastal Erosion",
+        "severity": 78.0,
+        "frequency": "Ongoing - Storm surge events",
+        "description": "Vulnerable coastal stretch with mangrove degradation. Storm surges cause temporary inundation and permanent erosion. Affects H011, H016. Community depends on fishing livelihoods."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [78.08, 30.25],
+          [78.10, 30.25],
+          [78.10, 30.28],
+          [78.08, 30.28],
+          [78.08, 30.25]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ009",
+      "properties": {
+        "id": "HZ009",
+        "name": "Eastern Escarpment Slide Area",
+        "hazard_type": "Landslide",
+        "severity": 85.0,
+        "frequency": "High - Post-earthquake and monsoon",
+        "description": "Escarpment with history of seismic-triggered landslides. Jointed rock mass with adverse dip. Threatens H008, H012. Road access frequently blocked."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [77.97, 30.34],
+          [78.00, 30.34],
+          [78.00, 30.38],
+          [77.97, 30.38],
+          [77.97, 30.34]
+        ]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "HZ010",
+      "properties": {
+        "id": "HZ010",
+        "name": "Estuarine Flood Risk Zone",
+        "hazard_type": "Flood",
+        "severity": 65.0,
+        "frequency": "Tidal + Monsoon combined",
+        "description": "Estuarine area with compound flood risk from high tides and river discharge. Moderate risk to H002, H009. Tidal gates provide partial protection."
+      },
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[
+          [78.05, 30.27],
+          [78.09, 30.27],
+          [78.09, 30.30],
+          [78.05, 30.30],
+          [78.05, 30.27]
+        ]]]
+      }
+    }
+  ]
+}
