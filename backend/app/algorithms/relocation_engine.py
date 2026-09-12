@@ -146,6 +146,10 @@ class RelocationRecommendationResult:
     risk_score: float
     risk_level: str
     population: int
+    exposure_score: float
+    vulnerability_score: float
+    hazard_score: float
+    accessibility_factor: float
     priority_score: float
     priority_level: PriorityLevel
     priority_reason: str
@@ -668,6 +672,10 @@ def get_all_recommendations(
         risk_score=risk_score,
         risk_level=risk_level,
         population=population,
+        exposure_score=priority_result.exposure_score,
+        vulnerability_score=priority_result.vulnerability_score,
+        hazard_score=priority_result.hazard_score,
+        accessibility_factor=priority_result.accessibility_factor,
         priority_score=priority_result.relocation_priority_score,
         priority_level=priority_result.priority_level,
         priority_reason=priority_result.priority_reason,

@@ -7,7 +7,7 @@ import {
   RelocationRecommendation,
   PriorityStatistics,
 } from '../services/api';
-import { RiskBadge, UtilizationBar, CapacityBadge } from '../components/Icons';
+import { UtilizationBar, CapacityBadge } from '../components/Icons';
 
 function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse bg-surface-200 rounded ${className}`} />;
@@ -229,9 +229,6 @@ export default function Relocation() {
 
   if (showDetail && selectedHabitation) {
     const rec = selectedHabitation;
-    const primary = rec.recommendations[0];
-    const alt1 = rec.recommendations[1];
-    const alt2 = rec.recommendations[2];
     const priorityColorsLocal = priorityColors[rec.priority_level] || priorityColors.P4;
     const riskColorsLocal = riskColors[rec.risk_level] || riskColors.LOW;
 
@@ -582,7 +579,7 @@ export default function Relocation() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-surface-50">
+<thead className="bg-surface-50">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-surface-500 uppercase tracking-wider cursor-pointer hover:bg-surface-100">
                   Habitation
@@ -603,12 +600,6 @@ export default function Relocation() {
                   Priority
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-surface-500 uppercase tracking-wider">
-                  Recommended Site
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-surface-500 uppercase tracking-wider">
-                  Match Score
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-surface-500 uppercase tracking-wider">
                   Action
                 </th>
               </tr>
@@ -617,7 +608,6 @@ export default function Relocation() {
               {filteredAndSortedPriorities.map((p) => {
                 const priorityColorsLocal = priorityColors[p.priority_level] || priorityColors.P4;
                 const riskColorsLocal = riskColors[p.risk_level] || riskColors.LOW;
-                const primarySite = p.recommendations?.[0];
                 
                 return (
                   <tr key={p.habitation_id} className="hover:bg-surface-50">
@@ -635,17 +625,9 @@ export default function Relocation() {
                         P{p.priority_level.slice(1)} — {['IMMEDIATE', 'URGENT', 'PLANNED', 'MONITOR'][parseInt(p.priority_level.slice(1)) - 1]}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-surface-700">
-                      {primarySite?.site_name || '—'}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-surface-900">
-                      {primarySite ? primarySite.match_score.toFixed(1) : '—'}
-                    </td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => {
-                          fetchRelocationRecommendations(p.habitation_id).then(setSelectedHabitation);
-                        }}
+                        onClick={() => fetchRelocationRecommendations(p.habitation_id).then(setSelectedHabitation)}
                         className="text-primary-600 hover:text-primary-700 text-sm font-medium"
                       >
                         View Recommendations
