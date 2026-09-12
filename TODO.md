@@ -291,3 +291,94 @@
 - [x] Login/logout still works
 - [x] No critical browser console errors
 - [x] Existing Parts 1-6 not broken
+
+---
+
+## Part 8 — Relocation Priority & Recommendation Engine
+
+### Core Priority Engine
+- [x] Deterministic, explainable relocation priority assessment engine
+- [x] Priority score formula: Risk×0.50 + Pop/Exp×0.20 + Vuln×0.15 + Hazard×0.10 + Access×0.05
+- [x] Configurable weights via PriorityWeights class
+- [x] Configurable classification thresholds via PriorityThresholds class
+- [x] Classification: P1 IMMEDIATE (90-100), P2 URGENT (75-89.99), P3 PLANNED (50-74.99), P4 MONITOR (0-49.99)
+
+### Priority Reasoning
+- [x] Human-readable priority reasons for each level
+- [x] Explainable contributing factors list
+- [x] Decision-support disclaimer on all outputs
+
+### Site Matching & Recommendation Engine
+- [x] Match score formula: Capacity×0.30 + Infra×0.30 + Env×0.15 + Access×0.10 + Safety×0.15
+- [x] Configurable weights via MatchWeights class
+- [x] Suitability classification: EXCELLENT (85-100), GOOD (70-84.99), CONDITIONAL (50-69.99), UNSUITABLE (0-49.99)
+- [x] Top 3 recommendations per habitation (Primary, Alternative 1, Alternative 2)
+- [x] "No suitable relocation site found" handling
+
+### Recommendation Reasoning
+- [x] Positive reasons (✓): Sufficient capacity, adequate healthcare/water/housing, good accessibility
+- [x] Negative reasons (⚠): High utilization, limited healthcare/school, poor road access
+- [x] Human-readable format without meaningless values
+
+### Relocation Priority APIs
+- [x] GET /api/relocation-priority - List with filtering (priority_level, risk_level)
+- [x] GET /api/relocation-priority/{habitation_id} - By habitation ID
+- [x] GET /api/relocation-priority/statistics - Aggregate statistics
+- [x] GET /api/relocation-priority/recommendations - All recommendations
+- [x] GET /api/relocation-priority/{habitation_id}/recommendations - By habitation ID
+- [x] Static routes defined before parameterized routes (avoiding route-order bugs)
+
+### Relocation UI
+- [x] Route /relocation integrated with app shell
+- [x] Summary KPI cards (total habitations, P1, P2, available capacity)
+- [x] Priority distribution visualization
+- [x] Methodology panels explaining priority formula and matching formula
+- [x] Habitation priority table (sortable, P1→P4 then score desc)
+- [x] Filtering: Search, Priority, Risk Level
+- [x] Detail view with full recommendation breakdown
+- [x] Visual indicators: Priority badges, Match scores, Suitability badges
+- [x] Loading states (skeleton loaders)
+- [x] Error states (graceful API error handling)
+- [x] Demo data disclaimer prominently displayed
+- [x] Decision-support disclaimer
+- [x] Responsive design (desktop, tablet, mobile)
+
+### Authentication & RBAC
+- [x] Protected route reuses Part 3 auth
+- [x] Permissions: view_relocation_sites, view_relocation_recommendations
+- [x] Role-aware navigation (DISASTER_MANAGEMENT_OFFICER, GIS_ANALYST, PLANNING_OFFICER, FIELD_OFFICER, VIEWER, ADMIN)
+- [x] Existing logout works
+- [x] Dashboard/GIS/Risk/Capacity authentication unaffected
+- [x] Read-only module (no editing implemented)
+
+### GIS Integration
+- [x] "View on Map" actions for habitation and recommended sites
+- [x] Reuses existing /map route (Part 5)
+
+### Data Consistency
+- [x] Uses existing habitation, risk, capacity, and infrastructure data
+- [x] Priority engine produces consistent classifications
+- [x] Sample data: 0 P1, 3 P2, 13 P3, 4 P4 (20 total)
+
+### Documentation
+- [x] docs/RELOCATION_RECOMMENDATIONS.md created with full methodology
+
+### Testing
+- [x] Backend starts successfully
+- [x] Frontend builds successfully (TypeScript + Vite)
+- [x] GET /api/health
+- [x] GET /api/relocation-priority
+- [x] GET /api/relocation-priority/statistics
+- [x] GET /api/relocation-priority/recommendations
+- [x] GET /api/relocation-priority/H001
+- [x] GET /api/relocation-priority/H001/recommendations
+- [x] Filter by priority_level works
+- [x] Filter by risk_level works
+- [x] Fixed routes (/statistics, /recommendations) NOT interpreted as {habitation_id}
+- [x] Dashboard still works
+- [x] GIS Map still works
+- [x] Risk Assessment still works
+- [x] Carrying Capacity still works
+- [x] Login/logout still works
+- [x] No critical browser console errors
+- [x] Existing Parts 1-7 not broken
