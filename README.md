@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Disaster Risk & Relocation Intelligence Platform
 
 **Intelligent Identification of Hazard-Based Red Zones, Carrying Capacity Assessment, and Immediate Relocation Needs for Vulnerable Habitations**
@@ -209,3 +210,6 @@ All sample data (habitations, hazards, relocation sites, etc.) is created for de
 ## License
 
 Government of India - Disaster Management Authority
+=======
+# geoshield
+>>>>>>> 18011b412f6b3251e61d64b61504e78f823c3846
