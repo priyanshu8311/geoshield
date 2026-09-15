@@ -1,0 +1,28 @@
+# CodeRabbit Configuration
+# Docs: https://docs.coderabbit.ai/getting-started/configure-coderabbit
+
+language: "en"
+
+reviews:
+  # Enable automatic reviews on PRs
+  auto_review:
+    enabled: true
+    drafts: false              # Skip draft PRs
+    base_branches:
+      - main                   # Only review PRs targeting main
+
+  # Review profile: "chill" for fewer comments, "assertive" for more
+  profile: "chill"
+
+  # Enable path-based review instructions
+  path_instructions:
+    - path: "backend/**"
+      instructions: "Review Python/FastAPI code for security, performance, and best practices."
+    - path: "frontend/**"
+      instructions: "Review React/TypeScript code for component structure, hooks usage, and accessibility."
+
+  # Request changes vs comment
+  request_changes_workflow: false
+
+chat:
+  auto_reply: true
