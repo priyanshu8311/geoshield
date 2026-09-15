@@ -327,13 +327,26 @@ export interface PriorityStatistics {
 
 export interface Alert {
   id: number;
-  level: string;
+  level: 'CRITICAL' | 'HIGH' | 'WARNING' | 'INFO';
+  status: 'ACTIVE' | 'ACKNOWLEDGED' | 'RESOLVED';
+  alert_type: 'RISK_THRESHOLD' | 'PRIORITY_ESCALATION' | 'CAPACITY_CONCERN' | 'HAZARD_UPDATE' | 'FIELD_VERIFICATION' | 'SYSTEM_INFO' | 'RELOCATION_PLAN';
   title: string;
   message: string;
+  description?: string;
   habitation_id?: string;
   relocation_site_id?: string;
+  related_risk_level?: string;
+  priority_level?: string;
+  priority_score?: number;
+  source?: string;
+  recommendation?: string;
   is_read: boolean;
+  acknowledged_at?: string;
+  acknowledged_by?: string;
+  resolved_at?: string;
+  resolved_by?: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface AlertListResponse {
@@ -348,6 +361,92 @@ export interface AlertStats {
   warning: number;
   info: number;
   unread: number;
+}
+
+export interface AlertStatistics {
+  total_alerts: number;
+  by_level: Record<string, number>;
+  by_status: Record<string, number>;
+  by_type: Record<string, number>;
+  unread: number;
+  recent_7_days: number;
+}
+
+export interface AcknowledgeAlertResponse {
+  message: string;
+  generated_count?: number;
+}
+
+export interface RiskSummaryReport {
+  total_habitations: number;
+  critical: number;
+  high: number;
+  elevated: number;
+  moderate: number;
+  low: number;
+  average_risk_score: number;
+  risk_distribution: Record<string, number>;
+}
+
+export interface RedZoneSummaryReport {
+  red_zone_habitations: number;
+  p1_count: number;
+  p2_count: number;
+  p3_count: number;
+  p4_count: number;
+  priority_distribution: Record<string, number>;
+  highest_priority_habitations: Array<{
+    habitation_id: string;
+    habitation_name: string;
+    priority_score: number;
+    priority_level: string;
+    risk_score: number;
+    risk_level: string;
+    population: number;
+  }>;
+}
+
+export interface RelocationCapacityReport {
+  total_sites: number;
+  total_capacity: number;
+  current_population: number;
+  available_capacity: number;
+  overall_utilization: number;
+  average_capacity_score: number;
+  status_distribution: Record<string, number>;
+  stressed_limited_sites: Array<{
+    site_id: string;
+    site_name: string;
+    total_capacity: number;
+    available_capacity: number;
+    utilization_percent: number;
+  }>;
+}
+
+export interface RelocationRecommendationReport {
+  habitations_requiring_relocation: number;
+  recommendations: Array<{
+    habitation_id: string;
+    habitation_name: string;
+    priority_level: string;
+    priority_score: number;
+    risk_level: string;
+    population: number;
+    recommended_site_id?: string;
+    recommended_site_name?: string;
+    match_score?: number;
+    suitability?: string;
+    available_capacity?: number;
+    limiting_factors: string[];
+  }>;
+}
+
+export interface ReportOverviewResponse {
+  risk_summary: RiskSummaryReport;
+  red_zone_summary: RedZoneSummaryReport;
+  capacity_summary: RelocationCapacityReport;
+  recommendation_summary: RelocationRecommendationReport;
+  generated_at: string;
 }
 
 export interface DashboardStats {
@@ -770,5 +869,65 @@ export async function fetchRelocationSitesWithCapacity(): Promise<RelocationSite
 export async function fetchRecentAlerts(limit: number = 10): Promise<AlertListResponse> {
   const response = await fetchWithAuth(`${API_BASE}/alerts?limit=${limit}&is_read=false`);
   if (!response.ok) throw new Error('Failed to fetch recent alerts');
+  return response.json();
+}
+
+export async function fetchAlertStatistics(): Promise<AlertStatistics> {
+  const response = await fetchWithAuth(`${API_BASE}/alerts/statistics`);
+  if (!response.ok) throw new Error('Failed to fetch alert statistics');
+  return response.json();
+}
+
+export async function acknowledgeAlert(alertId: number): Promise<Alert> {
+  const response = await fetchWithAuth(`${API_BASE}/alerts/${alertId}/acknowledge`, {
+    method: 'POST',
+  });
+  if (!response.ok) throw new Error('Failed to acknowledge alert');
+  return response.json();
+}
+
+export async function resolveAlert(alertId: number): Promise<Alert> {
+  const response = await fetchWithAuth(`${API_BASE}/alerts/${alertId}/resolve`, {
+    method: 'POST',
+  });
+  if (!response.ok) throw new Error('Failed to resolve alert');
+  return response.json();
+}
+
+export async function generateAlerts(): Promise<{ message: string; generated_count: number }> {
+  const response = await fetchWithAuth(`${API_BASE}/alerts/generate`, {
+    method: 'POST',
+  });
+  if (!response.ok) throw new Error('Failed to generate alerts');
+  return response.json();
+}
+
+export async function fetchRiskSummaryReport(): Promise<RiskSummaryReport> {
+  const response = await fetchWithAuth(`${API_BASE}/reports/risk-summary`);
+  if (!response.ok) throw new Error('Failed to fetch risk summary report');
+  return response.json();
+}
+
+export async function fetchRedZoneSummaryReport(): Promise<RedZoneSummaryReport> {
+  const response = await fetchWithAuth(`${API_BASE}/reports/red-zones`);
+  if (!response.ok) throw new Error('Failed to fetch red zone summary report');
+  return response.json();
+}
+
+export async function fetchRelocationCapacityReport(): Promise<RelocationCapacityReport> {
+  const response = await fetchWithAuth(`${API_BASE}/reports/relocation-capacity`);
+  if (!response.ok) throw new Error('Failed to fetch relocation capacity report');
+  return response.json();
+}
+
+export async function fetchRelocationRecommendationReport(): Promise<RelocationRecommendationReport> {
+  const response = await fetchWithAuth(`${API_BASE}/reports/relocation-recommendations`);
+  if (!response.ok) throw new Error('Failed to fetch relocation recommendation report');
+  return response.json();
+}
+
+export async function fetchReportOverview(): Promise<ReportOverviewResponse> {
+  const response = await fetchWithAuth(`${API_BASE}/reports/overview`);
+  if (!response.ok) throw new Error('Failed to fetch report overview');
   return response.json();
 }

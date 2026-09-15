@@ -13,7 +13,7 @@ This document describes the database architecture for the Hazard Relocation Plat
 
 ## Entity Relationship Diagram
 
-```
+```text
 +-----------------+       +----------------------+       +------------------------+
 |  Habitation     |<----->|  Infrastructure      |       |  RiskAssessment        |
 |                 |  1:1  |                      |       |                        |
@@ -77,10 +77,11 @@ This document describes the database architecture for the Hazard Relocation Plat
 ## Tables
 
 ### 1. users
+
 Authentication and authorization table (Phase 3+).
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | UUID | PRIMARY KEY, DEFAULT uuid_generate_v4() |
 | email | VARCHAR(255) | UNIQUE, NOT NULL, INDEX |
 | hashed_password | VARCHAR(255) | NOT NULL |
@@ -91,10 +92,11 @@ Authentication and authorization table (Phase 3+).
 | updated_at | TIMESTAMP | DEFAULT NOW() |
 
 ### 2. habitations
+
 Core entity representing vulnerable habitations.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | VARCHAR(20) | PRIMARY KEY |
 | name | VARCHAR(255) | NOT NULL |
 | district | VARCHAR(100) | NOT NULL |
@@ -114,15 +116,17 @@ Core entity representing vulnerable habitations.
 | updated_at | TIMESTAMP | DEFAULT NOW() |
 
 **Indexes:**
+
 - `idx_habitations_risk_level` ON risk_level
 - `idx_habitations_hazard_type` ON hazard_type
 - Spatial index on geometry (GIST)
 
 ### 3. hazards
+
 Hazard zones with spatial geometry.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | VARCHAR(20) | PRIMARY KEY |
 | name | VARCHAR(255) | NOT NULL |
 | hazard_type | ENUM | NOT NULL, INDEX |
@@ -134,14 +138,16 @@ Hazard zones with spatial geometry.
 | updated_at | TIMESTAMP | DEFAULT NOW() |
 
 **Indexes:**
+
 - `idx_hazards_hazard_type` ON hazard_type
 - Spatial index on geometry (GIST)
 
 ### 4. infrastructure
+
 Infrastructure assessment per habitation.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | INTEGER | PRIMARY KEY, AUTOINCREMENT |
 | habitation_id | VARCHAR(20) | FK(habitations.id), UNIQUE, NOT NULL |
 | roads_score | FLOAT | DEFAULT 0 |
@@ -162,10 +168,11 @@ Infrastructure assessment per habitation.
 | updated_at | TIMESTAMP | DEFAULT NOW() |
 
 ### 5. risk_assessments
+
 Risk assessment records for habitations.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | INTEGER | PRIMARY KEY, AUTOINCREMENT |
 | habitation_id | VARCHAR(20) | FK(habitations.id), NOT NULL, INDEX |
 | hazard_score | FLOAT | NOT NULL |
@@ -178,10 +185,11 @@ Risk assessment records for habitations.
 | created_at | TIMESTAMP | DEFAULT NOW() |
 
 ### 6. relocation_sites
+
 Potential relocation sites.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | VARCHAR(20) | PRIMARY KEY |
 | name | VARCHAR(255) | NOT NULL |
 | latitude | FLOAT | NOT NULL |
@@ -203,14 +211,16 @@ Potential relocation sites.
 | updated_at | TIMESTAMP | DEFAULT NOW() |
 
 **Indexes:**
+
 - `idx_relocation_sites_available_capacity` ON available_capacity
 - Spatial index on geometry (GIST)
 
 ### 7. capacity_assessments
+
 Capacity assessment for relocation sites.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | INTEGER | PRIMARY KEY, AUTOINCREMENT |
 | relocation_site_id | VARCHAR(20) | FK(relocation_sites.id), NOT NULL, INDEX |
 | capacity_score | FLOAT | NOT NULL |
@@ -224,10 +234,11 @@ Capacity assessment for relocation sites.
 | created_at | TIMESTAMP | DEFAULT NOW() |
 
 ### 8. relocation_assessments
+
 Relocation recommendations linking habitations to sites.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | INTEGER | PRIMARY KEY, AUTOINCREMENT |
 | habitation_id | VARCHAR(20) | FK(habitations.id), NOT NULL, INDEX |
 | relocation_site_id | VARCHAR(20) | FK(relocation_sites.id), NOT NULL, INDEX |
@@ -240,10 +251,11 @@ Relocation recommendations linking habitations to sites.
 | created_at | TIMESTAMP | DEFAULT NOW() |
 
 ### 9. alerts
+
 System alerts and notifications.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | INTEGER | PRIMARY KEY, AUTOINCREMENT |
 | level | ENUM | NOT NULL |
 | title | VARCHAR(255) | NOT NULL |
@@ -254,13 +266,15 @@ System alerts and notifications.
 | created_at | TIMESTAMP | DEFAULT NOW(), INDEX |
 
 **Indexes:**
+
 - `idx_alerts_level_created` ON (level, created_at)
 
 ### 10. audit_logs
+
 Audit trail for system actions.
 
 | Column | Type | Constraints |
-|--------|------|-------------|
+| --- | --- | --- |
 | id | INTEGER | PRIMARY KEY, AUTOINCREMENT |
 | user_id | UUID | FK(users.id) |
 | action | VARCHAR(100) | NOT NULL |
@@ -273,6 +287,7 @@ Audit trail for system actions.
 ## Enums
 
 ### RiskLevel
+
 - LOW
 - MODERATE
 - ELEVATED
@@ -280,23 +295,27 @@ Audit trail for system actions.
 - CRITICAL
 
 ### HazardType
+
 - LANDSLIDE
 - FLOOD
 - CLOUDBURST
 - COASTAL_EROSION
 
 ### CapacityStatus
+
 - SUFFICIENT
 - LIMITED
 - INSUFFICIENT
 
 ### PriorityLevel
+
 - P1 (Immediate Relocation Planning)
 - P2 (High Priority)
 - P3 (Planned Relocation)
 - P4 (Monitor)
 
 ### AlertLevel
+
 - CRITICAL
 - HIGH
 - WARNING
@@ -305,12 +324,15 @@ Audit trail for system actions.
 ## Spatial Data
 
 ### Geometry Types
+
 - **habitations.geometry**: POINT (SRID 4326)
 - **hazards.geometry**: MULTIPOLYGON (SRID 4326)
 - **relocation_sites.geometry**: POINT (SRID 4326)
 
 ### Spatial Indexes
+
 All geometry columns have GIST indexes for efficient spatial queries:
+
 ```sql
 CREATE INDEX idx_habitations_geometry ON habitations USING GIST (geometry);
 CREATE INDEX idx_hazards_geometry ON hazards USING GIST (geometry);
@@ -318,6 +340,7 @@ CREATE INDEX idx_relocation_sites_geometry ON relocation_sites USING GIST (geome
 ```
 
 ### Example Spatial Queries
+
 ```sql
 -- Find habitations within 10km of a point
 SELECT * FROM habitations
@@ -340,6 +363,7 @@ ORDER BY distance LIMIT 5;
 The project includes comprehensive sample data for development and demonstration:
 
 ### Habitations (20 records)
+
 - IDs: H001-H020
 - Districts: "Demo District"
 - States: "Demo State"
@@ -348,47 +372,56 @@ The project includes comprehensive sample data for development and demonstration
 - Populations: 540-4,200
 
 ### Hazards (10 zones)
+
 - IDs: HZ001-HZ010
 - Types: Landslide (3), Flood (3), Cloudburst (2), Coastal Erosion (2)
 - Geometries: MULTIPOLYGON covering risk zones
 
 ### Relocation Sites (5 sites)
+
 - IDs: R001-R005
 - Capacities: 2,500-5,000
 - Available: 500-3,800
 - Status: SUFFICIENT (3), LIMITED (2)
 
 ### Infrastructure (20 records)
+
 - One per habitation
 - Scores for: roads, water, healthcare, schools, electricity, sanitation, emergency
 - Detailed facility counts and response times
 
 ### Risk Assessments (20 records)
+
 - One per habitation
 - Contributing factors arrays
 - Assessment date: 2024-01-15
 
 ### Capacity Assessments (5 records)
+
 - One per relocation site
 - Component statuses: water, housing, healthcare, roads
 
 ### Relocation Assessments (20 records)
+
 - One per habitation
 - Priority levels: P1 (4), P2 (5), P3 (6), P4 (5)
 - Distances: 2.1-22.0 km
 
 ### Alerts (10 records)
+
 - Levels: CRITICAL (2), HIGH (2), WARNING (2), INFO (4)
 - Mix of habitation-specific and system-wide alerts
 
 ## Setup Instructions
 
 ### Prerequisites
+
 - PostgreSQL 15+
 - PostGIS 3.4+
 - Python 3.11+
 
 ### 1. Create Database
+
 ```bash
 # Connect to PostgreSQL
 psql -U postgres
@@ -401,18 +434,21 @@ CREATE EXTENSION postgis_topology;
 ```
 
 ### 2. Configure Environment
+
 ```bash
 cp .env.example .env
 # Edit .env with your database credentials
 ```
 
 Example `.env`:
+
 ```env
 DATABASE_URL=postgresql://postgres:password@localhost:5432/hazard_db
 SQL_ECHO=false
 ```
 
 ### 3. Install Dependencies
+
 ```bash
 cd backend
 python -m venv venv
@@ -421,6 +457,7 @@ pip install -r requirements.txt
 ```
 
 ### 4. Run Migrations (Optional - Tables auto-create)
+
 ```bash
 # Tables are created automatically on startup via init_db()
 # For Alembic migrations (future):
@@ -428,19 +465,22 @@ pip install -r requirements.txt
 ```
 
 ### 5. Seed Sample Data
+
 ```bash
 # From project root
 python -m app.database.seed
 ```
 
 Or from backend directory:
+
 ```bash
 cd backend
 python -m app.database.seed
 ```
 
 Expected output:
-```
+
+```text
 ============================================================
 Database Seed Script - Hazard Relocation Platform
 ============================================================
@@ -473,6 +513,7 @@ Seeding completed successfully!
 ```
 
 ### 6. Verify Data
+
 ```bash
 # Start backend
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
@@ -490,7 +531,9 @@ curl http://localhost:8000/api/relocation-sites
 If PostgreSQL/PostGIS is unavailable, the application runs in **fallback mode** using sample JSON/GeoJSON files.
 
 ### Fallback Data Files
+
 Located in `data/sample/`:
+
 - `habitations.json` - 20 habitation records
 - `hazards.geojson` - 10 hazard zones (GeoJSON FeatureCollection)
 - `relocation_sites.json` - 5 relocation sites
@@ -501,6 +544,7 @@ Located in `data/sample/`:
 - `alerts.json` - 10 alerts
 
 ### How Fallback Works
+
 1. On startup, `is_database_available()` checks database connectivity
 2. If unavailable, API endpoints automatically use `FallbackDataService`
 3. Fallback service reads from JSON files in `data/sample/`
@@ -508,7 +552,9 @@ Located in `data/sample/`:
 5. Frontend operates normally without database
 
 ### Enabling Fallback Mode
+
 Simply don't configure DATABASE_URL or ensure PostgreSQL is not running:
+
 ```bash
 # Don't set DATABASE_URL or set to invalid value
 # The app will detect and use fallback data
@@ -516,47 +562,53 @@ Simply don't configure DATABASE_URL or ensure PostgreSQL is not running:
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| DATABASE_URL | PostgreSQL connection string | postgresql://postgres:postgres@localhost:5432/hazard_db |
-| SQL_ECHO | Enable SQL query logging | false |
+- `DATABASE_URL`: PostgreSQL connection string (default: `postgresql://postgres:postgres@localhost:5432/hazard_db`)
+- `SQL_ECHO`: Enable SQL query logging (default: `false`)
 
 ## API Endpoints
 
 ### Habitations
+
 - `GET /api/habitations` - List with filters
 - `GET /api/habitations/{id}` - Get by ID
 - `GET /api/habitations/stats/summary` - Statistics
 
 ### Hazards
+
 - `GET /api/hazards` - List with filters
 - `GET /api/hazards/{id}` - Get by ID
 
 ### Infrastructure
+
 - `GET /api/infrastructure` - List with filters
 - `GET /api/infrastructure/{habitation_id}` - Get by habitation
 
 ### Relocation Sites
+
 - `GET /api/relocation-sites` - List with filters
 - `GET /api/relocation-sites/{id}` - Get by ID
 - `GET /api/relocation-sites/stats/summary` - Statistics
 
 ### Risk Assessments
+
 - `GET /api/risk-assessments` - List with filters
 - `GET /api/risk-assessments/{id}` - Get by ID
 - `GET /api/risk-assessments/habitation/{habitation_id}` - Get by habitation
 
 ### Capacity Assessments
+
 - `GET /api/capacity-assessments` - List with filters
 - `GET /api/capacity-assessments/{id}` - Get by ID
 - `GET /api/capacity-assessments/site/{site_id}` - Get by site
 
 ### Relocation Assessments
+
 - `GET /api/relocation-assessments` - List with filters
 - `GET /api/relocation-assessments/{id}` - Get by ID
 - `GET /api/relocation-assessments/habitation/{habitation_id}` - Get by habitation
 
 ### Alerts
+
 - `GET /api/alerts` - List with filters
 - `GET /api/alerts/{id}` - Get by ID
 - `GET /api/alerts/stats/summary` - Statistics
@@ -564,41 +616,50 @@ Simply don't configure DATABASE_URL or ensure PostgreSQL is not running:
 ## Development Notes
 
 ### Adding New Sample Data
+
 1. Add records to appropriate JSON file in `data/sample/`
 2. Run seed script to populate database (if using PostgreSQL)
 3. Fallback mode automatically picks up new data
 
 ### Spatial Data in Sample Files
+
 - Habitations: Latitude/Longitude in JSON, converted to POINT geometry
 - Hazards: GeoJSON FeatureCollection with MULTIPOLYGON geometries
 - Relocation Sites: Latitude/Longitude in JSON, converted to POINT geometry
 
 ### Data Disclaimer
+
 All sample data is **fictional/demo data** and does not represent official government assessments. The disclaimer "Demo Mode: Data shown in this prototype is fictional/sample data and does not represent official government risk assessments." is displayed in the UI.
 
 ## Troubleshooting
 
 ### Database Connection Failed
-```
+
+```text
 Error: could not connect to server: Connection refused
 ```
+
 - Ensure PostgreSQL is running: `sudo systemctl start postgresql` (Linux) or check Services (Windows)
 - Verify DATABASE_URL in .env
 - Check firewall/network access
 
 ### PostGIS Not Installed
-```
+
+```text
 Error: could not access file "$libdir/postgis-3": No such file or directory
 ```
+
 - Install PostGIS: `sudo apt-get install postgresql-15-postgis-3` (Ubuntu)
 - Run `CREATE EXTENSION postgis;` in database
 
 ### Seed Script Fails
+
 - Check database permissions
 - Ensure sample data files exist in `data/sample/`
 - Check for duplicate primary keys (script skips existing records)
 
 ### Fallback Mode Not Working
+
 - Verify `data/sample/` directory exists with JSON files
 - Check file permissions
 - Ensure Python can read the files

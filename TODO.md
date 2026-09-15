@@ -14,7 +14,6 @@
 - [x] Relocation capacity (from /api/relocation-sites with utilization calculation)
 - [x] Decision-support summary (auto-generated from API data)
 - [x] Quick actions (role-aware with coming soon labels)
-- [x] System health indicator (from /api/health)
 
 ### Authentication & Authorization
 - [x] Part 3 authentication integration
@@ -382,3 +381,87 @@
 - [x] Login/logout still works
 - [x] No critical browser console errors
 - [x] Existing Parts 1-7 not broken
+
+---
+
+## Part 9 — Alerts & Reports System
+
+### Alert Generation Engine
+- [x] Alert engine consuming canonical outputs from Parts 6-8
+- [x] Prototype alert rules: CRITICAL (risk=CRITICAL or P1), HIGH (risk=HIGH or P2 or capacity stressed), WARNING (risk=ELEVATED or P3), INFO (P4)
+- [x] Alert types: RISK_THRESHOLD, PRIORITY_ESCALATION, CAPACITY_CONCERN, HAZARD_UPDATE, FIELD_VERIFICATION, SYSTEM_INFO, RELOCATION_PLAN
+- [x] Deduplication logic to avoid duplicate alerts
+
+### Alert Data Model
+- [x] Enhanced Alert model with status (ACTIVE/ACKNOWLEDGED/RESOLVED), alert_type, description, related_risk_level, priority_level, priority_score, source, recommendation
+- [x] Acknowledgment and resolution tracking (timestamp, user)
+- [x] Audit logging for acknowledge/resolve/generate actions
+
+### Alert API Endpoints
+- [x] GET /api/alerts (with filtering: level, status, type, habitation, site, search)
+- [x] GET /api/alerts/{alert_id}
+- [x] GET /api/alerts/stats/summary (basic stats)
+- [x] GET /api/alerts/statistics (detailed stats by level/status/type)
+- [x] POST /api/alerts/{alert_id}/acknowledge (RBAC: manage_alerts)
+- [x] POST /api/alerts/{alert_id}/resolve (RBAC: manage_alerts)
+- [x] POST /api/alerts/generate (RBAC: manage_alerts)
+- [x] Static routes (/stats/summary, /statistics, /generate) ordered before /{alert_id}
+
+### Report API Endpoints
+- [x] GET /api/reports/risk-summary
+- [x] GET /api/reports/red-zones
+- [x] GET /api/reports/relocation-capacity
+- [x] GET /api/reports/relocation-recommendations
+- [x] GET /api/reports/overview
+
+### Report Content
+- [x] Report 1: Risk Summary (total, by level, average score, distribution)
+- [x] Report 2: Red Zone / High-Priority (red zone count, P1-P4, highest priority habitations)
+- [x] Report 3: Relocation Capacity (total sites, capacity, utilization, stressed sites)
+- [x] Report 4: Relocation Recommendations (habitations requiring assessment, recommendations with match scores, suitability, limiting factors)
+
+### Export Functionality
+- [x] CSV export for alerts list
+- [x] CSV export for risk summary
+- [x] CSV export for red zone summary
+- [x] CSV export for relocation capacity
+- [x] CSV export for relocation recommendations
+
+### Frontend Pages
+- [x] /alerts - Alert list with filters, search, detail modal, acknowledge/resolve actions, generate button, CSV export
+- [x] /reports - Four report sections with summary cards, tables, visual indicators, CSV export, refresh
+
+### Navigation & Dashboard Integration
+- [x] MainLayout: Removed "comingSoon" from Alerts and Reports
+- [x] App.tsx: Added Alerts and Reports routes
+- [x] Dashboard: Active Alerts KPI uses dynamic alert count from API
+
+### Authentication & RBAC
+- [x] ADMIN: full access (view, acknowledge, resolve, generate, view/export reports)
+- [x] DISASTER_MANAGEMENT_OFFICER: full access
+- [x] GIS_ANALYST: view alerts, view/export reports
+- [x] PLANNING_OFFICER: view alerts, view/export reports
+- [x] FIELD_OFFICER: view assigned alerts, acknowledge, view/export reports
+- [x] VIEWER: read-only alerts, read-only reports
+
+### Demo Disclaimers
+- [x] Demo data disclaimer on all pages
+- [x] Prototype alert rules disclaimer
+- [x] Decision-support outputs disclaimer
+
+### Documentation
+- [x] docs/ALERTS_AND_REPORTS.md created
+
+### Testing
+- [x] Backend tests pass (3/3)
+- [x] Frontend build succeeds (TypeScript + Vite)
+- [x] All API endpoints return 200 with correct data
+- [x] RBAC enforcement verified
+- [x] Route ordering verified (static before dynamic)
+- [x] Parts 1-8 remain functional
+
+---
+
+## Part 10 — [PENDING]
+
+Part 10 remains pending and has NOT been started.

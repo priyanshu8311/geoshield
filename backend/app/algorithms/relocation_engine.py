@@ -37,6 +37,10 @@ from enum import Enum
 import math
 
 
+def _new_string_list() -> List[str]:
+    return []
+
+
 class PriorityLevel(str, Enum):
     P1 = "P1"
     P2 = "P2"
@@ -112,7 +116,7 @@ class RelocationPriorityResult:
     relocation_priority_score: float
     priority_level: PriorityLevel
     priority_reason: str
-    contributing_factors: List[str] = field(default_factory=list)
+    contributing_factors: List[str] = field(default_factory=_new_string_list)
     assessment_version: str = "1.0"
     weights_used: PriorityWeights = field(default_factory=PriorityWeights)
     thresholds_used: PriorityThresholds = field(default_factory=PriorityThresholds)
@@ -133,8 +137,8 @@ class SiteRecommendation:
     environmental_score: float
     accessibility_score: float
     safety_score: float
-    recommendation_reasons: List[str] = field(default_factory=list)
-    limiting_factors: List[str] = field(default_factory=list)
+    recommendation_reasons: List[str] = field(default_factory=_new_string_list)
+    limiting_factors: List[str] = field(default_factory=_new_string_list)
     distance_km: float = 0.0
 
 
@@ -225,7 +229,7 @@ def get_suitability_label(level: SiteSuitability) -> str:
 
 def calculate_priority_score(
     habitation: Dict[str, Any],
-    infrastructure: Optional[Dict] = None,
+    infrastructure: Optional[Dict[str, Any]] = None,
     weights: PriorityWeights = DEFAULT_PRIORITY_WEIGHTS
 ) -> tuple[float, List[str]]:
     """
@@ -238,7 +242,7 @@ def calculate_priority_score(
     - Hazard severity (10%): From habitation hazard_score
     - Accessibility (5%): Based on road connectivity and emergency response
     """
-    factors = []
+    factors: List[str] = []
     
     # Risk component (50%)
     risk_score = habitation.get("risk_score", 0)
@@ -320,7 +324,7 @@ def generate_priority_reason(
 
 def calculate_capacity_suitability(site: Dict[str, Any], habitation_population: int) -> tuple[float, List[str]]:
     """Calculate capacity suitability score (0-100)."""
-    reasons = []
+    reasons: List[str] = []
     available = site.get("available_capacity", 0)
     utilization = site.get("utilization_percent", 0)
     
@@ -350,8 +354,8 @@ def calculate_capacity_suitability(site: Dict[str, Any], habitation_population: 
 
 def calculate_infrastructure_suitability(site: Dict[str, Any]) -> tuple[float, List[str]]:
     """Calculate infrastructure suitability score (0-100)."""
-    reasons = []
-    scores = []
+    reasons: List[str] = []
+    scores: List[float] = []
     
     # Check each infrastructure component
     infra_checks = [
@@ -383,7 +387,7 @@ def calculate_infrastructure_suitability(site: Dict[str, Any]) -> tuple[float, L
 
 def calculate_environmental_suitability(site: Dict[str, Any]) -> tuple[float, List[str]]:
     """Calculate environmental suitability score (0-100)."""
-    reasons = []
+    reasons: List[str] = []
     status = site.get("environmental_status", "UNKNOWN")
     
     if status == "ADEQUATE":
@@ -404,7 +408,7 @@ def calculate_environmental_suitability(site: Dict[str, Any]) -> tuple[float, Li
 
 def calculate_accessibility_score(site: Dict[str, Any], habitation: Dict[str, Any]) -> tuple[float, List[str]]:
     """Calculate accessibility score (0-100) based on distance and road connectivity."""
-    reasons = []
+    reasons: List[str] = []
     
     # Distance factor
     distance = calculate_distance(
@@ -444,7 +448,7 @@ def calculate_accessibility_score(site: Dict[str, Any], habitation: Dict[str, An
 
 def calculate_safety_score(site: Dict[str, Any], habitation: Dict[str, Any]) -> tuple[float, List[str]]:
     """Calculate safety score (0-100) based on site's capacity status and environmental risk."""
-    reasons = []
+    reasons: List[str] = []
     capacity_status = site.get("capacity_status", "UNKNOWN")
     
     if capacity_status == "ADEQUATE":
@@ -481,7 +485,9 @@ def evaluate_site_match(
     site: Dict[str, Any],
     habitation: Dict[str, Any],
     capacity_assessment: Dict[str, Any],
-    weights: MatchWeights = DEFAULT_MATCH_WEIGHTS
+    weights: MatchWeights = DEFAULT_MATCH_WEIGHTS,
+    *,
+    suitability_thresholds: SuitabilityThresholds = DEFAULT_SUITABILITY_THRESHOLDS
 ) -> SiteRecommendation:
     """Evaluate a relocation site for a specific habitation."""
     
@@ -504,11 +510,11 @@ def evaluate_site_match(
     match_score = min(max(match_score, 0), 100)
     
     # Determine suitability
-    suitability = classify_suitability(match_score)
+    suitability = classify_suitability(match_score, suitability_thresholds)
     
     # Collect all reasons and limiting factors
-    all_reasons = []
-    all_limiting = []
+    all_reasons: List[str] = []
+    all_limiting: List[str] = []
     
     for r in capacity_reasons:
         if r.startswith("⚠") or r.startswith("Insufficient"):
@@ -566,7 +572,7 @@ def evaluate_site_match(
 
 def assess_relocation_priority(
     habitation: Dict[str, Any],
-    infrastructure: Optional[Dict] = None,
+    infrastructure: Optional[Dict[str, Any]] = None,
     weights: PriorityWeights = DEFAULT_PRIORITY_WEIGHTS,
     thresholds: PriorityThresholds = DEFAULT_PRIORITY_THRESHOLDS
 ) -> RelocationPriorityResult:
@@ -623,10 +629,12 @@ def assess_relocation_priority(
 
 def get_all_recommendations(
     habitation: Dict[str, Any],
-    sites: List[Dict],
-    capacity_assessments: Dict[str, Dict],
+    sites: List[Dict[str, Any]],
+    capacity_assessments: Dict[str, Dict[str, Any]],
     weights: MatchWeights = DEFAULT_MATCH_WEIGHTS,
-    suitability_thresholds: SuitabilityThresholds = DEFAULT_SUITABILITY_THRESHOLDS
+    suitability_thresholds: SuitabilityThresholds = DEFAULT_SUITABILITY_THRESHOLDS,
+    *,
+    infrastructure: Optional[Dict[str, Any]] = None
 ) -> RelocationRecommendationResult:
     """
     Get top 3 relocation site recommendations for a habitation.
@@ -638,10 +646,10 @@ def get_all_recommendations(
     population = habitation.get("population", 0)
     
     # Get priority assessment
-    priority_result = assess_relocation_priority(habitation)
+    priority_result = assess_relocation_priority(habitation, infrastructure)
     
     # Evaluate all sites
-    recommendations = []
+    recommendations: List[SiteRecommendation] = []
     for site in sites:
         site_id = site.get("id", "")
         capacity_assessment = capacity_assessments.get(site_id, {})
@@ -650,7 +658,13 @@ def get_all_recommendations(
         if not capacity_assessment:
             continue
         
-        recommendation = evaluate_site_match(site, habitation, capacity_assessment, weights)
+        recommendation = evaluate_site_match(
+            site,
+            habitation,
+            capacity_assessment,
+            weights,
+            suitability_thresholds=suitability_thresholds,
+        )
         
         # Only include sites that are at least CONDITIONAL
         if recommendation.suitability != SiteSuitability.UNSUITABLE:
@@ -687,20 +701,23 @@ def get_all_recommendations(
 
 
 def assess_all_priorities(
-    habitations: List[Dict],
-    infrastructure_data: Optional[List[Dict]] = None,
+    habitations: List[Dict[str, Any]],
+    infrastructure_data: Optional[List[Dict[str, Any]]] = None,
     weights: PriorityWeights = DEFAULT_PRIORITY_WEIGHTS,
     thresholds: PriorityThresholds = DEFAULT_PRIORITY_THRESHOLDS
 ) -> List[RelocationPriorityResult]:
     """Assess relocation priority for all habitations."""
-    infra_lookup = {}
+    infra_lookup: Dict[str, Optional[Dict[str, Any]]] = {}
     if infrastructure_data:
         for infra in infrastructure_data:
-            infra_lookup[infra.get("habitation_id")] = infra
+            habitation_id = infra.get("habitation_id")
+            if habitation_id is not None:
+                infra_lookup[str(habitation_id)] = infra
     
-    results = []
+    results: List[RelocationPriorityResult] = []
     for hab in habitations:
-        infra = infra_lookup.get(hab.get("id"))
+        habitation_id = hab.get("id")
+        infra = infra_lookup.get(str(habitation_id)) if habitation_id is not None else None
         result = assess_relocation_priority(hab, infra, weights, thresholds)
         results.append(result)
     
@@ -738,3 +755,233 @@ def get_priority_statistics(results: List[RelocationPriorityResult]) -> Dict[str
         "total_population_at_risk": total_pop_at_risk,
         "priority_distribution": distribution,
     }
+
+
+def generate_alerts_from_data(
+    habitations: List[Dict[str, Any]],
+    sites: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """
+    Generate prototype alerts from current risk, priority, and capacity data.
+    
+    PROTOTYPE RULES - Not official government standards.
+    These are decision-support rules for demonstration purposes only.
+    
+    Alert Rules:
+    - CRITICAL: risk_level = CRITICAL OR priority = P1
+    - HIGH: risk_level = HIGH OR priority = P2 OR site capacity stressed
+    - MEDIUM: risk_level = ELEVATED OR priority = P3 OR capacity limited
+    - LOW: priority = P4, informational
+    """
+    from app.models import AlertLevel, AlertStatus, AlertType, PriorityLevel, RiskLevel, CapacityStatus
+    
+    alerts = []
+    alert_id = 1
+    
+    # Helper to create alert
+    def create_alert(
+        level: str,
+        alert_type: str,
+        title: str,
+        message: str,
+        description: str = None,
+        habitation_id: str = None,
+        site_id: str = None,
+        risk_level: str = None,
+        priority_level: str = None,
+        priority_score: float = None,
+        recommendation: str = None,
+    ) -> Dict[str, Any]:
+        nonlocal alert_id
+        alert = {
+            "id": alert_id,
+            "level": level,
+            "status": AlertStatus.ACTIVE.value,
+            "alert_type": alert_type,
+            "title": title,
+            "message": message,
+            "description": description,
+            "habitation_id": habitation_id,
+            "relocation_site_id": site_id,
+            "related_risk_level": risk_level,
+            "priority_level": priority_level,
+            "priority_score": priority_score,
+            "source": "AUTO_GENERATED",
+            "recommendation": recommendation,
+            "is_read": 0,
+            "acknowledged_at": None,
+            "acknowledged_by": None,
+            "resolved_at": None,
+            "resolved_by": None,
+            "created_at": None,  # Will be set by API
+            "updated_at": None,
+        }
+        alert_id += 1
+        return alert
+    
+    # Build site lookup for capacity checks
+    site_lookup = {s["id"]: s for s in sites}
+    
+    # 1. Generate alerts from habitation risk and priority
+    for hab in habitations:
+        hab_id = hab.get("id")
+        hab_name = hab.get("name", hab_id)
+        risk_score = hab.get("risk_score", 0)
+        risk_level = hab.get("risk_level", "UNKNOWN")
+        priority_level = hab.get("relocation_priority", "P4")
+        hazard_type = hab.get("hazard_type", "Unknown")
+        hazard_score = hab.get("hazard_score", 0)
+        
+        # Determine priority score if available
+        priority_score = None
+        if "relocation_priority_score" in hab:
+            priority_score = hab["relocation_priority_score"]
+        
+        # Helper to format priority score
+        def fmt_score(score):
+            return f"{score:.1f}" if score is not None else "N/A"
+        
+        # CRITICAL alerts
+        if risk_level == "CRITICAL":
+            alerts.append(create_alert(
+                level=AlertLevel.CRITICAL.value,
+                alert_type=AlertType.RISK_THRESHOLD.value,
+                title=f"Critical Risk Threshold Crossed - {hab_name} ({hab_id})",
+                message=f"Village {hab_name} ({hab_id}) has crossed the critical risk threshold with a risk score of {risk_score:.1f}. Immediate relocation planning initiated. {hazard_type} risk extremely high.",
+                description=f"Risk score {risk_score:.1f} exceeds CRITICAL threshold. {hazard_type} hazard score: {hazard_score:.1f}. Population at risk: {hab.get('population', 0):,}.",
+                habitation_id=hab_id,
+                risk_level=risk_level,
+                priority_level=priority_level,
+                priority_score=priority_score,
+                recommendation="Immediate evacuation planning and relocation assessment required. Contact district disaster management authority.",
+            ))
+        
+        if priority_level == "P1":
+            alerts.append(create_alert(
+                level=AlertLevel.CRITICAL.value,
+                alert_type=AlertType.PRIORITY_ESCALATION.value,
+                title=f"Immediate Relocation Priority - {hab_name} ({hab_id})",
+                message=f"Habitation {hab_name} ({hab_id}) classified as P1 IMMEDIATE priority (score: {fmt_score(priority_score)}). Requires urgent relocation action.",
+                description=f"Priority score {fmt_score(priority_score)} places this habitation in P1 IMMEDIATE category. Risk level: {risk_level}. Population: {hab.get('population', 0):,}.",
+                habitation_id=hab_id,
+                risk_level=risk_level,
+                priority_level=priority_level,
+                priority_score=priority_score,
+                recommendation="Initiate immediate relocation planning. Coordinate with relocation site authorities for capacity reservation.",
+            ))
+        
+        # HIGH alerts
+        if risk_level == "HIGH":
+            alerts.append(create_alert(
+                level=AlertLevel.HIGH.value,
+                alert_type=AlertType.RISK_THRESHOLD.value,
+                title=f"High Risk Detected - {hab_name} ({hab_id})",
+                message=f"Village {hab_name} ({hab_id}) has HIGH risk level with risk score {risk_score:.1f}. Elevated {hazard_type} hazard requires monitoring and preparedness.",
+                description=f"Risk score {risk_score:.1f} in HIGH range. {hazard_type} hazard score: {hazard_score:.1f}. Population: {hab.get('population', 0):,}.",
+                habitation_id=hab_id,
+                risk_level=risk_level,
+                priority_level=priority_level,
+                priority_score=priority_score,
+                recommendation="Review evacuation plans. Pre-position emergency resources. Monitor risk indicators closely.",
+            ))
+        
+        if priority_level == "P2":
+            alerts.append(create_alert(
+                level=AlertLevel.HIGH.value,
+                alert_type=AlertType.PRIORITY_ESCALATION.value,
+                title=f"Urgent Relocation Priority - {hab_name} ({hab_id})",
+                message=f"Habitation {hab_name} ({hab_id}) classified as P2 URGENT priority (score: {fmt_score(priority_score)}). Requires urgent relocation planning.",
+                description=f"Priority score {fmt_score(priority_score)} places this habitation in P2 URGENT category. Risk level: {risk_level}. Population: {hab.get('population', 0):,}.",
+                habitation_id=hab_id,
+                risk_level=risk_level,
+                priority_level=priority_level,
+                priority_score=priority_score,
+                recommendation="Expedite relocation site assessment. Prepare detailed relocation plan within 30 days.",
+            ))
+        
+        # MEDIUM alerts (WARNING level)
+        if risk_level == "ELEVATED":
+            alerts.append(create_alert(
+                level=AlertLevel.WARNING.value,
+                alert_type=AlertType.RISK_THRESHOLD.value,
+                title=f"Elevated Risk - {hab_name} ({hab_id})",
+                message=f"Village {hab_name} ({hab_id}) has ELEVATED risk level with risk score {risk_score:.1f}. {hazard_type} hazard monitoring recommended.",
+                description=f"Risk score {risk_score:.1f} in ELEVATED range. {hazard_type} hazard score: {hazard_score:.1f}. Population: {hab.get('population', 0):,}.",
+                habitation_id=hab_id,
+                risk_level=risk_level,
+                priority_level=priority_level,
+                priority_score=priority_score,
+                recommendation="Continue monitoring. Update risk assessment quarterly. Review mitigation measures.",
+            ))
+        
+        if priority_level == "P3":
+            alerts.append(create_alert(
+                level=AlertLevel.WARNING.value,
+                alert_type=AlertType.PRIORITY_ESCALATION.value,
+                title=f"Planned Relocation Priority - {hab_name} ({hab_id})",
+                message=f"Habitation {hab_name} ({hab_id}) classified as P3 PLANNED priority (score: {fmt_score(priority_score)}). Planned relocation assessment recommended.",
+                description=f"Priority score {fmt_score(priority_score)} places this habitation in P3 PLANNED category. Risk level: {risk_level}. Population: {hab.get('population', 0):,}.",
+                habitation_id=hab_id,
+                risk_level=risk_level,
+                priority_level=priority_level,
+                priority_score=priority_score,
+                recommendation="Schedule relocation feasibility study. Identify potential relocation sites. Budget planning recommended.",
+            ))
+        
+        # LOW/INFO alerts for P4
+        if priority_level == "P4":
+            alerts.append(create_alert(
+                level=AlertLevel.INFO.value,
+                alert_type=AlertType.PRIORITY_ESCALATION.value,
+                title=f"Monitor Status - {hab_name} ({hab_id})",
+                message=f"Habitation {hab_name} ({hab_id}) classified as P4 MONITOR priority. Continue routine monitoring.",
+                description=f"Priority score {fmt_score(priority_score)} in P4 MONITOR range. Risk level: {risk_level}. Population: {hab.get('population', 0):,}.",
+                habitation_id=hab_id,
+                risk_level=risk_level,
+                priority_level=priority_level,
+                priority_score=priority_score,
+                recommendation="Maintain current monitoring schedule. No immediate action required.",
+            ))
+    
+    # 2. Generate alerts from relocation site capacity
+    for site in sites:
+        site_id = site.get("id")
+        site_name = site.get("name", site_id)
+        total_cap = site.get("total_capacity", 0)
+        current_pop = site.get("current_population", 0)
+        available_cap = site.get("available_capacity", 0)
+        utilization = (current_pop / total_cap * 100) if total_cap > 0 else 0
+        
+        # Capacity alerts
+        if utilization >= 90:
+            alerts.append(create_alert(
+                level=AlertLevel.CRITICAL.value,
+                alert_type=AlertType.CAPACITY_CONCERN.value,
+                title=f"Relocation Site {site_name} ({site_id}) Near Capacity",
+                message=f"Relocation Site {site_name} ({site_id}) has only {available_cap} available capacity remaining. Current utilization: {utilization:.1f}%. Risk of overcapacity.",
+                description=f"Total capacity: {total_cap:,}, Current population: {current_pop:,}, Available: {available_cap:,}, Utilization: {utilization:.1f}%.",
+                site_id=site_id,
+                recommendation="Halt new relocations to this site. Expedite infrastructure expansion. Identify alternative sites immediately.",
+            ))
+        elif utilization >= 75:
+            alerts.append(create_alert(
+                level=AlertLevel.HIGH.value,
+                alert_type=AlertType.CAPACITY_CONCERN.value,
+                title=f"Relocation Site {site_name} ({site_id}) Capacity Stressed",
+                message=f"Relocation Site {site_name} ({site_id}) utilization at {utilization:.1f}%. Only {available_cap} capacity remaining.",
+                description=f"Total capacity: {total_cap:,}, Current population: {current_pop:,}, Available: {available_cap:,}, Utilization: {utilization:.1f}%.",
+                site_id=site_id,
+                recommendation="Review planned relocations. Prepare capacity expansion plans. Monitor closely.",
+            ))
+        elif utilization >= 50:
+            alerts.append(create_alert(
+                level=AlertLevel.WARNING.value,
+                alert_type=AlertType.CAPACITY_CONCERN.value,
+                title=f"Relocation Site {site_name} ({site_id}) Capacity Limited",
+                message=f"Relocation Site {site_name} ({site_id}) utilization at {utilization:.1f}%. Available capacity: {available_cap}.",
+                description=f"Total capacity: {total_cap:,}, Current population: {current_pop:,}, Available: {available_cap:,}, Utilization: {utilization:.1f}%.",
+                site_id=site_id,
+                recommendation="Monitor capacity trends. Plan for future expansion if relocations increase.",
+            ))
+    
+    return alerts

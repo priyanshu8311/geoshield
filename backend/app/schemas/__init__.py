@@ -40,6 +40,22 @@ class AlertLevel(str, Enum):
     INFO = "INFO"
 
 
+class AlertStatus(str, Enum):
+    ACTIVE = "ACTIVE"
+    ACKNOWLEDGED = "ACKNOWLEDGED"
+    RESOLVED = "RESOLVED"
+
+
+class AlertType(str, Enum):
+    RISK_THRESHOLD = "RISK_THRESHOLD"
+    PRIORITY_ESCALATION = "PRIORITY_ESCALATION"
+    CAPACITY_CONCERN = "CAPACITY_CONCERN"
+    HAZARD_UPDATE = "HAZARD_UPDATE"
+    FIELD_VERIFICATION = "FIELD_VERIFICATION"
+    SYSTEM_INFO = "SYSTEM_INFO"
+    RELOCATION_PLAN = "RELOCATION_PLAN"
+
+
 class UserRole(str, Enum):
     ADMIN = "ADMIN"
     DISASTER_MANAGEMENT_OFFICER = "DISASTER_MANAGEMENT_OFFICER"
@@ -379,18 +395,76 @@ class PriorityStatisticsResponse(BaseModel):
     priority_distribution: Dict[str, int]
 
 
+class RiskSummaryReport(BaseModel):
+    total_habitations: int
+    critical: int
+    high: int
+    elevated: int
+    moderate: int
+    low: int
+    average_risk_score: float
+    risk_distribution: Dict[str, int]
+
+
+class RedZoneSummaryReport(BaseModel):
+    red_zone_habitations: int
+    p1_count: int
+    p2_count: int
+    p3_count: int
+    p4_count: int
+    priority_distribution: Dict[str, int]
+    highest_priority_habitations: List[Dict[str, Any]]
+
+
+class RelocationCapacityReport(BaseModel):
+    total_sites: int
+    total_capacity: int
+    current_population: int
+    available_capacity: int
+    overall_utilization: float
+    average_capacity_score: float
+    status_distribution: Dict[str, int]
+    stressed_limited_sites: List[Dict[str, Any]]
+
+
+class RelocationRecommendationReport(BaseModel):
+    habitations_requiring_relocation: int
+    recommendations: List[Dict[str, Any]]
+
+
+class ReportOverviewResponse(BaseModel):
+    risk_summary: RiskSummaryReport
+    red_zone_summary: RedZoneSummaryReport
+    capacity_summary: RelocationCapacityReport
+    recommendation_summary: RelocationRecommendationReport
+    generated_at: datetime
+
+
 class AlertBase(BaseModel):
     level: AlertLevel
+    status: AlertStatus = AlertStatus.ACTIVE
+    alert_type: AlertType
     title: str
     message: str
+    description: Optional[str] = None
     habitation_id: Optional[str] = None
     relocation_site_id: Optional[str] = None
+    related_risk_level: Optional[RiskLevel] = None
+    priority_level: Optional[PriorityLevel] = None
+    priority_score: Optional[float] = None
+    source: Optional[str] = None
+    recommendation: Optional[str] = None
 
 
 class AlertResponse(AlertBase):
     id: int
     is_read: bool
+    acknowledged_at: Optional[datetime] = None
+    acknowledged_by: Optional[str] = None
+    resolved_at: Optional[datetime] = None
+    resolved_by: Optional[str] = None
     created_at: datetime
+    updated_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 

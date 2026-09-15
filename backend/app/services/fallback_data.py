@@ -343,6 +343,7 @@ class FallbackDataService:
 
     def get_alerts(self, level: Optional[str] = None, habitation_id: Optional[str] = None,
                     relocation_site_id: Optional[str] = None, is_read: Optional[bool] = None,
+                    status: Optional[str] = None, alert_type: Optional[str] = None,
                     limit: int = 100, offset: int = 0) -> Dict:
         data = self.alerts
         if level:
@@ -353,6 +354,10 @@ class FallbackDataService:
             data = [a for a in data if a.get("relocation_site_id") == relocation_site_id]
         if is_read is not None:
             data = [a for a in data if a.get("is_read", 0) == (1 if is_read else 0)]
+        if status:
+            data = [a for a in data if a.get("status", "ACTIVE") == status]
+        if alert_type:
+            data = [a for a in data if a.get("alert_type", "SYSTEM_INFO") == alert_type]
 
         data = sorted(data, key=lambda x: x.get("created_at", ""), reverse=True)
         total = len(data)
@@ -373,6 +378,222 @@ class FallbackDataService:
             "warning": sum(1 for a in self.alerts if a.get("level") == "WARNING"),
             "info": sum(1 for a in self.alerts if a.get("level") == "INFO"),
             "unread": sum(1 for a in self.alerts if a.get("is_read", 0) == 0),
+        }
+
+    def get_alert_statistics(self) -> Dict:
+        """Get detailed alert statistics."""
+        alerts = self.alerts
+        by_level = {"CRITICAL": 0, "HIGH": 0, "WARNING": 0, "INFO": 0}
+        by_status = {"ACTIVE": 0, "ACKNOWLEDGED": 0, "RESOLVED": 0}
+        by_type = {}
+        for a in alerts:
+            by_level[a.get("level", "INFO")] = by_level.get(a.get("level", "INFO"), 0) + 1
+            by_status[a.get("status", "ACTIVE")] = by_status.get(a.get("status", "ACTIVE"), 0) + 1
+            at = a.get("alert_type", "SYSTEM_INFO")
+            by_type[at] = by_type.get(at, 0) + 1
+        unread = sum(1 for a in alerts if a.get("is_read", 0) == 0)
+        return {
+            "total_alerts": len(alerts),
+            "by_level": by_level,
+            "by_status": by_status,
+            "by_type": by_type,
+            "unread": unread,
+            "recent_7_days": len(alerts),
+        }
+
+    def acknowledge_alert(self, alert_id: int, username: str) -> Optional[Dict]:
+        for a in self.alerts:
+            if a.get("id") == alert_id:
+                if a.get("status") == "RESOLVED":
+                    return None
+                a["status"] = "ACKNOWLEDGED"
+                a["acknowledged_at"] = datetime.utcnow().isoformat() + "Z"
+                a["acknowledged_by"] = username
+                a["updated_at"] = datetime.utcnow().isoformat() + "Z"
+                return a
+        return None
+
+    def resolve_alert(self, alert_id: int, username: str) -> Optional[Dict]:
+        for a in self.alerts:
+            if a.get("id") == alert_id:
+                a["status"] = "RESOLVED"
+                a["resolved_at"] = datetime.utcnow().isoformat() + "Z"
+                a["resolved_by"] = username
+                a["updated_at"] = datetime.utcnow().isoformat() + "Z"
+                return a
+        return None
+
+    def generate_alerts(self) -> Dict:
+        """Generate alerts from current data."""
+        from app.algorithms import generate_alerts_from_data
+        habitations = self.habitations
+        sites = self.relocation_sites
+        new_alerts = generate_alerts_from_data(habitations, sites)
+        for alert_data in reversed(new_alerts):
+            alert_data["id"] = len(self.alerts) + 1
+            alert_data["is_read"] = 0
+            alert_data["created_at"] = datetime.utcnow().isoformat() + "Z"
+            alert_data["updated_at"] = datetime.utcnow().isoformat() + "Z"
+            self.alerts.insert(0, alert_data)
+        return {"generated_count": len(new_alerts)}
+
+    # Report methods
+    def get_risk_summary_report(self) -> Dict:
+        """Generate risk summary report from Part 6 risk engine calculations."""
+        from app.algorithms import assess_all_habitations
+        habitations = self.habitations
+        hazards = self.hazards
+        infrastructure = self.infrastructure
+        # hazards is a list of features, extract properties
+        hazard_data = [h.get("properties", {}) for h in hazards]
+        results = assess_all_habitations(habitations, hazard_data, infrastructure)
+        
+        total = len(results)
+        by_risk = {"CRITICAL": 0, "HIGH": 0, "ELEVATED": 0, "MODERATE": 0, "LOW": 0}
+        total_score = 0
+        for r in results:
+            level = r.risk_level.value if hasattr(r.risk_level, 'value') else r.risk_level
+            by_risk[level] = by_risk.get(level, 0) + 1
+            total_score += r.overall_score
+        return {
+            "total_habitations": total,
+            "critical": by_risk.get("CRITICAL", 0),
+            "high": by_risk.get("HIGH", 0),
+            "elevated": by_risk.get("ELEVATED", 0),
+            "moderate": by_risk.get("MODERATE", 0),
+            "low": by_risk.get("LOW", 0),
+            "average_risk_score": round(total_score / total, 1) if total > 0 else 0,
+            "risk_distribution": by_risk,
+        }
+
+    def get_red_zone_summary_report(self) -> Dict:
+        """Generate red-zone/priority summary report from Part 8 data."""
+        from app.algorithms import assess_all_priorities
+        habitations = self.habitations
+        infrastructure = self.infrastructure
+        results = assess_all_priorities(habitations, infrastructure)
+        
+        p_counts = {"P1": 0, "P2": 0, "P3": 0, "P4": 0}
+        red_zone = 0
+        for r in results:
+            p_counts[r.priority_level.value] = p_counts.get(r.priority_level.value, 0) + 1
+            if r.priority_level.value in ["P1", "P2"]:
+                red_zone += 1
+        
+        # Get highest priority habitations
+        sorted_results = sorted(results, key=lambda r: r.relocation_priority_score, reverse=True)
+        highest = [
+            {
+                "habitation_id": r.habitation_id,
+                "habitation_name": r.habitation_name,
+                "priority_score": r.relocation_priority_score,
+                "priority_level": r.priority_level.value,
+                "risk_score": r.risk_score,
+                "risk_level": r.risk_level,
+                "population": r.population,
+            }
+            for r in sorted_results[:10]
+        ]
+        
+        return {
+            "red_zone_habitations": red_zone,
+            "p1_count": p_counts.get("P1", 0),
+            "p2_count": p_counts.get("P2", 0),
+            "p3_count": p_counts.get("P3", 0),
+            "p4_count": p_counts.get("P4", 0),
+            "priority_distribution": p_counts,
+            "highest_priority_habitations": highest,
+        }
+
+    def get_relocation_capacity_report(self) -> Dict:
+        """Generate relocation capacity report from Part 7 data."""
+        sites = self.relocation_sites
+        capacity_assessments = self.capacity_assessments
+        
+        total_sites = len(sites)
+        total_capacity = sum(s.get("total_capacity", 0) for s in sites)
+        current_pop = sum(s.get("current_population", 0) for s in sites)
+        available_cap = sum(s.get("available_capacity", 0) for s in sites)
+        utilization = (current_pop / total_capacity * 100) if total_capacity > 0 else 0
+        
+        # Capacity scores from assessments
+        cap_scores = [c.get("capacity_score", 0) for c in capacity_assessments]
+        avg_cap_score = sum(cap_scores) / len(cap_scores) if cap_scores else 0
+        
+        # Status distribution
+        status_dist = {"ADEQUATE": 0, "LIMITED": 0, "STRESSED": 0, "INSUFFICIENT": 0}
+        for c in capacity_assessments:
+            status = c.get("capacity_status", "ADEQUATE")
+            status_dist[status] = status_dist.get(status, 0) + 1
+        
+        # Stressed/limited sites
+        stressed = []
+        for s in sites:
+            avail = s.get("available_capacity", 0)
+            tot = s.get("total_capacity", 0)
+            util = (s.get("current_population", 0) / tot * 100) if tot > 0 else 0
+            if util >= 75:
+                stressed.append({
+                    "site_id": s["id"],
+                    "site_name": s["name"],
+                    "total_capacity": tot,
+                    "available_capacity": avail,
+                    "utilization_percent": round(util, 1),
+                })
+        
+        return {
+            "total_sites": total_sites,
+            "total_capacity": total_capacity,
+            "current_population": current_pop,
+            "available_capacity": available_cap,
+            "overall_utilization": round(utilization, 1),
+            "average_capacity_score": round(avg_cap_score, 1),
+            "status_distribution": status_dist,
+            "stressed_limited_sites": stressed,
+        }
+
+    def get_relocation_recommendation_report(self) -> Dict:
+        """Generate relocation recommendation report from Part 8 data."""
+        from app.algorithms import get_all_recommendations
+        habitations = self.habitations
+        sites = self.relocation_sites
+        cap_dict = {}
+        for c in self.capacity_assessments:
+            cap_dict[c["relocation_site_id"]] = c
+        
+        recommendations = []
+        for hab in habitations:
+            result = get_all_recommendations(hab, sites, cap_dict)
+            if result.recommendations:
+                primary = result.primary_recommendation
+                recommendations.append({
+                    "habitation_id": result.habitation_id,
+                    "habitation_name": result.habitation_name,
+                    "priority_level": result.priority_level.value,
+                    "priority_score": result.priority_score,
+                    "risk_level": result.risk_level,
+                    "population": result.population,
+                    "recommended_site_id": primary.relocation_site_id if primary else None,
+                    "recommended_site_name": primary.site_name if primary else None,
+                    "match_score": primary.match_score if primary else None,
+                    "suitability": primary.suitability.value if primary else None,
+                    "available_capacity": primary.available_capacity if primary else None,
+                    "limiting_factors": primary.limiting_factors if primary else [],
+                })
+        
+        return {
+            "habitations_requiring_relocation": len(recommendations),
+            "recommendations": recommendations,
+        }
+
+    def get_report_overview(self) -> Dict:
+        """Generate comprehensive report overview."""
+        return {
+            "risk_summary": self.get_risk_summary_report(),
+            "red_zone_summary": self.get_red_zone_summary_report(),
+            "capacity_summary": self.get_relocation_capacity_report(),
+            "recommendation_summary": self.get_relocation_recommendation_report(),
+            "generated_at": datetime.utcnow().isoformat() + "Z",
         }
 
     def get_dashboard_stats(self) -> Dict:

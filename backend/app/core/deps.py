@@ -19,7 +19,7 @@ def get_fallback_user(user_id: str):
         "demo-dmo-id": {"id": "demo-dmo-id", "username": "dmo", "email": "dmo@disaster.gov.in", "full_name": "Disaster Management Officer", "role": UserRole.DISASTER_MANAGEMENT_OFFICER, "is_active": 1, "created_at": None},
         "demo-gis-id": {"id": "demo-gis-id", "username": "gis", "email": "gis@disaster.gov.in", "full_name": "GIS Analyst", "role": UserRole.GIS_ANALYST, "is_active": 1, "created_at": None},
         "demo-planner-id": {"id": "demo-planner-id", "username": "planner", "email": "planner@disaster.gov.in", "full_name": "Planning Officer", "role": UserRole.PLANNING_OFFICER, "is_active": 1, "created_at": None},
-        "demo-field-id": {"id": "demo-field-id", "username": "field", "email": "field@disaster.gov.in", "full_name": "Field Officer", "role": UserRole.FIELD_OFFICER, "is_active": 1, "created_at": None},
+        "demo-field-id": {"id": "demo-field-id", "username": "field", "email": "field@disaster.gov.in", "full_name": "Field Officer", "role": UserRole.FIELD_OFFICER, "assigned_habitation_ids": ["H001", "H002"], "is_active": 1, "created_at": None},
         "demo-viewer-id": {"id": "demo-viewer-id", "username": "viewer", "email": "viewer@disaster.gov.in", "full_name": "Viewer", "role": UserRole.VIEWER, "is_active": 1, "created_at": None},
     }
     user_data = demo_users.get(user_id)
@@ -96,6 +96,22 @@ def require_permission(permission: str):
     return permission_checker
 
 
+def get_assigned_habitation_ids(current_user: User) -> Optional[set[str]]:
+    """Return the user's habitation scope, or None for unrestricted roles."""
+    if current_user.role != UserRole.FIELD_OFFICER:
+        return None
+    return set(getattr(current_user, "assigned_habitation_ids", None) or [])
+
+
+def require_assigned_habitation(habitation_id: str, current_user: User) -> None:
+    assigned_ids = get_assigned_habitation_ids(current_user)
+    if assigned_ids is not None and habitation_id not in assigned_ids:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Habitation is outside the user's assigned scope"
+        )
+
+
 # Role-based permissions mapping
 ROLE_PERMISSIONS = {
     UserRole.ADMIN: ["all"],
@@ -128,6 +144,7 @@ ROLE_PERMISSIONS = {
         "view_dashboard",
     ],
     UserRole.FIELD_OFFICER: [
+        "view_relocation_recommendations",
         "view_assigned_habitations",
         "view_hazards",
         "view_alerts",

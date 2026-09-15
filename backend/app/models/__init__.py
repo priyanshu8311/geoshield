@@ -46,6 +46,22 @@ class AlertLevel(str, enum.Enum):
     INFO = "INFO"
 
 
+class AlertStatus(str, enum.Enum):
+    ACTIVE = "ACTIVE"
+    ACKNOWLEDGED = "ACKNOWLEDGED"
+    RESOLVED = "RESOLVED"
+
+
+class AlertType(str, enum.Enum):
+    RISK_THRESHOLD = "RISK_THRESHOLD"
+    PRIORITY_ESCALATION = "PRIORITY_ESCALATION"
+    CAPACITY_CONCERN = "CAPACITY_CONCERN"
+    HAZARD_UPDATE = "HAZARD_UPDATE"
+    FIELD_VERIFICATION = "FIELD_VERIFICATION"
+    SYSTEM_INFO = "SYSTEM_INFO"
+    RELOCATION_PLAN = "RELOCATION_PLAN"
+
+
 class UserRole(str, enum.Enum):
     ADMIN = "ADMIN"
     DISASTER_MANAGEMENT_OFFICER = "DISASTER_MANAGEMENT_OFFICER"
@@ -64,6 +80,7 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(255))
     role = Column(Enum(UserRole), default=UserRole.VIEWER, nullable=False)
+    assigned_habitation_ids = Column(JSON, nullable=False, default=list)
     is_active = Column(Integer, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -236,12 +253,25 @@ class Alert(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     level = Column(Enum(AlertLevel), nullable=False)
+    status = Column(Enum(AlertStatus), default=AlertStatus.ACTIVE, nullable=False)
+    alert_type = Column(Enum(AlertType), nullable=False)
     title = Column(String(255), nullable=False)
     message = Column(Text, nullable=False)
+    description = Column(Text, nullable=True)
     habitation_id = Column(String(20), ForeignKey("habitations.id"), nullable=True, index=True)
     relocation_site_id = Column(String(20), ForeignKey("relocation_sites.id"), nullable=True, index=True)
+    related_risk_level = Column(Enum(RiskLevel), nullable=True)
+    priority_level = Column(Enum(PriorityLevel), nullable=True)
+    priority_score = Column(Float, nullable=True)
+    source = Column(String(100), nullable=True)
+    recommendation = Column(Text, nullable=True)
     is_read = Column(Integer, default=0)
+    acknowledged_at = Column(DateTime, nullable=True)
+    acknowledged_by = Column(String(255), nullable=True)
+    resolved_at = Column(DateTime, nullable=True)
+    resolved_by = Column(String(255), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 Index("idx_habitations_risk_level", Habitation.risk_level)

@@ -2,10 +2,12 @@ import { useEffect, useState, useMemo } from 'react';
 import {
   fetchRelocationPriorities,
   fetchPriorityStatistics,
+  fetchRelocationSiteStats,
   fetchRelocationRecommendations,
   RelocationPriority,
   RelocationRecommendation,
   PriorityStatistics,
+  RelocationSiteStats,
 } from '../services/api';
 import { UtilizationBar, CapacityBadge } from '../components/Icons';
 
@@ -68,6 +70,7 @@ function TableSkeleton() {
 export default function Relocation() {
   const [priorities, setPriorities] = useState<RelocationPriority[]>([]);
   const [statistics, setStatistics] = useState<PriorityStatistics | null>(null);
+  const [siteStatistics, setSiteStatistics] = useState<RelocationSiteStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedHabitation, setSelectedHabitation] = useState<RelocationRecommendation | null>(null);
@@ -82,12 +85,22 @@ export default function Relocation() {
       try {
         setLoading(true);
         setError(null);
-        const [prioritiesData, statisticsData] = await Promise.all([
+        const [prioritiesResult, statisticsResult, siteStatisticsResult] = await Promise.allSettled([
           fetchRelocationPriorities({ limit: 100 }),
           fetchPriorityStatistics(),
+          fetchRelocationSiteStats(),
         ]);
-        setPriorities(prioritiesData.relocation_priorities);
-        setStatistics(statisticsData);
+        if (prioritiesResult.status === 'rejected') throw prioritiesResult.reason;
+        if (statisticsResult.status === 'rejected') throw statisticsResult.reason;
+
+        setPriorities(prioritiesResult.value.relocation_priorities);
+        setStatistics(statisticsResult.value);
+        if (siteStatisticsResult.status === 'fulfilled') {
+          setSiteStatistics(siteStatisticsResult.value);
+        } else {
+          setSiteStatistics(null);
+          console.warn('Failed to load relocation site statistics:', siteStatisticsResult.reason);
+        }
       } catch (err) {
         console.error('Failed to load relocation priority data:', err);
         setError('Failed to load relocation priority data. Please try again.');
@@ -480,8 +493,8 @@ export default function Relocation() {
         </div>
         <div className="bg-white rounded-xl border border-surface-200 p-6">
           <p className="text-sm font-medium text-surface-500">Available Relocation Capacity</p>
-          <p className="mt-1 text-3xl font-bold text-surface-900">10,200</p>
-          <p className="mt-1 text-sm text-surface-500">Across 5 sites</p>
+          <p className="mt-1 text-3xl font-bold text-surface-900">{siteStatistics?.available_capacity.toLocaleString() ?? '0'}</p>
+          <p className="mt-1 text-sm text-surface-500">Across {siteStatistics?.total_sites ?? 0} sites</p>
         </div>
       </div>
 

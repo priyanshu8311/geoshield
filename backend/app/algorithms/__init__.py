@@ -69,6 +69,7 @@ from app.algorithms.relocation_engine import (
     get_all_recommendations,
     assess_all_priorities,
     get_priority_statistics,
+    generate_alerts_from_data,
 )
 
 __all__ = [
@@ -139,4 +140,5 @@ __all__ = [
     "get_all_recommendations",
     "assess_all_priorities",
     "get_priority_statistics",
+    "generate_alerts_from_data",
 ]

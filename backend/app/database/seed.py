@@ -1,3 +1,5 @@
+# pyright: basic, reportOptionalCall=false, reportOptionalMemberAccess=false, reportAttributeAccessIssue=false, reportInvalidTypeForm=false, reportArgumentType=false
+
 import json
 import os
 import sys
@@ -340,6 +342,7 @@ def seed_users(db: Session):
             "email": "field@disaster.gov.in",
             "full_name": "Field Officer",
             "role": UserRole.FIELD_OFFICER,
+            "assigned_habitation_ids": ["H001", "H002"],
             "hashed_password": hashed_password,
         },
         {
@@ -353,6 +356,7 @@ def seed_users(db: Session):
     
     count = 0
     for user_data in demo_users:
+        user_data.setdefault("assigned_habitation_ids", [])
         existing = db.query(User).filter(User.username == user_data["username"]).first()
         if existing:
             continue
@@ -362,6 +366,7 @@ def seed_users(db: Session):
             full_name=user_data["full_name"],
             role=user_data["role"],
             hashed_password=user_data["hashed_password"],
+            assigned_habitation_ids=user_data["assigned_habitation_ids"],
             is_active=1,
         )
         db.add(user)

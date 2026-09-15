@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
-from app.api import api_router
+from app.api import api_router, relocation_priority
+from app.core.deps import get_current_active_user
 
 app = FastAPI(
     title="Hazard Relocation Platform",
@@ -21,6 +22,11 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix="/api")
+app.include_router(
+    relocation_priority.router,
+    prefix="/api",
+    dependencies=[Depends(get_current_active_user)],
+)
 
 
 @app.get("/api/health")

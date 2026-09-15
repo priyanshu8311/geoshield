@@ -16,8 +16,8 @@ const navItems = [
   { label: 'Red Zones', path: '/red-zones', icon: <ZoneIcon />, comingSoon: true, permissions: ['view_red_zones', 'view_risk'] },
   { label: 'Carrying Capacity', path: '/carrying-capacity', icon: <CapacityIcon />, permissions: ['view_capacity'] },
   { label: 'Relocation', path: '/relocation', icon: <RelocationIcon />, permissions: ['view_relocation_sites', 'view_relocation_recommendations'] },
-  { label: 'Alerts', path: '/alerts', icon: <AlertIcon />, comingSoon: true, permissions: ['view_alerts', 'manage_alerts'] },
-  { label: 'Reports', path: '/reports', icon: <ReportIcon />, comingSoon: true, permissions: ['view_reports'] },
+  { label: 'Alerts', path: '/alerts', icon: <AlertIcon />, permissions: ['view_alerts', 'manage_alerts'] },
+  { label: 'Reports', path: '/reports', icon: <ReportIcon />, permissions: ['view_reports'] },
 ];
 
 export default function MainLayout() {

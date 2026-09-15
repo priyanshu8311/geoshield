@@ -14,7 +14,7 @@ This is a **decision-support prototype** — not an official government risk cla
 
 ### Formula
 
-```
+```text
 Risk Score = (Exposure × 0.50) + (Vulnerability × 0.30) + ((100 - Coping Capacity) × 0.20)
 ```
 
@@ -25,7 +25,7 @@ Risk Score = (Exposure × 0.50) + (Vulnerability × 0.30) + ((100 - Coping Capac
 ### Classification Thresholds
 
 | Level | Score Range | Description |
-|-------|-------------|-------------|
+| --- | --- | --- |
 | LOW | 0–20 | Minimal risk |
 | MODERATE | 21–40 | Low risk, monitoring recommended |
 | ELEVATED | 41–60 | Moderate risk, preparedness needed |
@@ -43,10 +43,12 @@ Thresholds are configurable via `RiskThresholds` class.
 **Primary Source**: Habitation `hazard_score` (already normalized 0–100)
 
 **Enhancements**:
+
 - Population exposure: `min(population / 10000 × 8, 8)` points
 - Spatial hazard intersection: Up to 5 points from intersecting hazard zone severity
 
 **Factors** (explainable):
+
 - "Hazard score (primary): 92.5"
 - "Population exposure (1240): +1.0"
 - "Hazard zone intersection bonus: +2.3"
@@ -56,6 +58,7 @@ Thresholds are configurable via `RiskThresholds` class.
 **Primary Source**: Habitation `vulnerability_score` (already normalized 0–100)
 
 **Enhancements**:
+
 - No healthcare facilities: +5
 - Slow emergency response (>120 min): +4
 - Very poor road connectivity: +4
@@ -64,6 +67,7 @@ Thresholds are configurable via `RiskThresholds` class.
 - Small isolated population (<500): +2
 
 **Factors** (explainable):
+
 - "Base vulnerability score: 85.0"
 - "No healthcare facilities: +5"
 - "Large population (1240): +3"
@@ -73,6 +77,7 @@ Thresholds are configurable via `RiskThresholds` class.
 **Base**: Average of 6 infrastructure scores (healthcare, emergency, roads, water, electricity, sanitation)
 
 **Enhancements**:
+
 - Multiple healthcare facilities (≥3): +10
 - Healthcare facility present (≥1): +5
 - No healthcare: -5
@@ -87,6 +92,7 @@ Thresholds are configurable via `RiskThresholds` class.
 - High electricity coverage (>90%): +3
 
 **Factors** (explainable):
+
 - "Base infrastructure capacity: 39.2"
 - "No healthcare facilities: -5"
 - "Slow emergency response (120 min): -5"
@@ -111,7 +117,7 @@ Uses point-in-polygon test against hazard zone MultiPolygons (GeoJSON).
 All endpoints under `/api/risk-assessments`:
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
+| --- | --- | --- |
 | `/` | GET | List stored risk assessments (legacy) |
 | `/{assessment_id}` | GET | Get assessment by ID (legacy) |
 | `/habitation/{habitation_id}` | GET | Get assessment by habitation (legacy) |
@@ -166,6 +172,7 @@ The Risk Assessment page (`/risk-assessment`) provides:
 ### Permissions
 
 Requires: `view_risk` OR `view_risk_layers`
+
 - ADMIN: ✓
 - GIS_ANALYST: ✓
 - VIEWER: ✓
@@ -176,7 +183,7 @@ Requires: `view_risk` OR `view_risk_layers`
 ## Data Sources
 
 | Data | Source | Endpoint |
-|------|--------|----------|
+| --- | --- | --- |
 | Habitations | Sample JSON | `/api/habitations` |
 | Hazards (with geometry) | Sample GeoJSON | `/api/hazards` |
 | Infrastructure | Sample JSON | `/api/infrastructure` |
@@ -205,7 +212,7 @@ Requires: `view_risk` OR `view_risk_layers`
 ## Future Production Improvements
 
 | Area | Planned Enhancement |
-|------|---------------------|
+| --- | --- |
 | **Data Integration** | Connect to live hazard feeds, census data, satellite imagery |
 | **Model Calibration** | Historical event validation, expert weight tuning |
 | **Uncertainty** | Monte Carlo simulation, confidence intervals |
@@ -220,7 +227,7 @@ Requires: `view_risk` OR `view_risk_layers`
 ## Files
 
 | File | Purpose |
-|------|---------|
+| --- | --- |
 | `backend/app/algorithms/risk_engine.py` | Core risk calculation logic |
 | `backend/app/api/risk_assessments.py` | REST API endpoints |
 | `backend/app/schemas/__init__.py` | Pydantic response models |

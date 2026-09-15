@@ -1,8 +1,14 @@
+from app.core.deps import (
+    get_assigned_habitation_ids,
+    get_current_active_user,
+    require_assigned_habitation,
+    require_permission,
+)
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 from app.database import get_db, is_database_available
-from app.models import PriorityLevel, Habitation, Infrastructure, RelocationSite, CapacityAssessment
+from app.models import PriorityLevel, Habitation, Infrastructure, RelocationSite, CapacityAssessment, User
 from app.schemas import (
     RelocationPriorityResponse,
     RelocationPriorityListResponse,
@@ -22,6 +28,13 @@ from app.algorithms import (
 )
 
 router = APIRouter(prefix="/relocation-priority", tags=["relocation-priority"])
+
+
+def _scope_habitations(habitations: list, current_user: User) -> list:
+    assigned_ids = get_assigned_habitation_ids(current_user)
+    if assigned_ids is None:
+        return habitations
+    return [habitation for habitation in habitations if habitation.get("id") in assigned_ids]
 
 
 def _map_algo_priority_to_model(level: AlgoPriorityLevel) -> PriorityLevel:
@@ -110,25 +123,25 @@ def _convert_recommendation_result(result) -> RelocationRecommendationResponse:
 
 
 @router.get("/statistics", response_model=PriorityStatisticsResponse)
-async def get_priority_statistics(db: Optional[Session] = Depends(get_db)):
+async def get_priority_statistics(
+    db: Optional[Session] = Depends(get_db),
+    current_user: User = Depends(require_permission("view_relocation_recommendations")),
+):
     """Get aggregate relocation priority statistics."""
     if is_database_available() and db:
         # For database mode, we'd need to compute from stored assessments
         # For now, fall back to computed statistics
-        habitations = db.query(Habitation).all()
+        habitations = _scope_habitations(
+            [h.__dict__ for h in db.query(Habitation).all()], current_user
+        )
         hab_dicts = [
             {
-                "id": h.id,
-                "name": h.name,
-                "population": h.population,
-                "latitude": h.latitude,
-                "longitude": h.longitude,
-                "hazard_type": h.hazard_type.value if hasattr(h.hazard_type, 'value') else h.hazard_type,
-                "hazard_score": h.hazard_score,
-                "exposure_score": h.exposure_score,
-                "vulnerability_score": h.vulnerability_score,
-                "risk_score": h.risk_score,
-                "risk_level": h.risk_level.value if hasattr(h.risk_level, 'value') else h.risk_level,
+                "id": h["id"], "name": h["name"], "population": h["population"],
+                "latitude": h["latitude"], "longitude": h["longitude"],
+                "hazard_type": h["hazard_type"].value if hasattr(h["hazard_type"], 'value') else h["hazard_type"],
+                "hazard_score": h["hazard_score"], "exposure_score": h["exposure_score"],
+                "vulnerability_score": h["vulnerability_score"], "risk_score": h["risk_score"],
+                "risk_level": h["risk_level"].value if hasattr(h["risk_level"], 'value') else h["risk_level"],
             }
             for h in habitations
         ]
@@ -144,7 +157,7 @@ async def get_priority_statistics(db: Optional[Session] = Depends(get_db)):
         results = assess_all_priorities(hab_dicts, infra_dicts)
         stats = algo_get_priority_statistics(results)
     else:
-        habitations = fallback_service.habitations
+        habitations = _scope_habitations(fallback_service.habitations, current_user)
         infrastructure = fallback_service.infrastructure
         results = assess_all_priorities(habitations, infrastructure)
         stats = algo_get_priority_statistics(results)
@@ -153,25 +166,25 @@ async def get_priority_statistics(db: Optional[Session] = Depends(get_db)):
 
 
 @router.get("/recommendations", response_model=list[RelocationRecommendationResponse])
-async def get_all_recommendations_endpoint(db: Optional[Session] = Depends(get_db)):
+async def get_all_recommendations_endpoint(
+    db: Optional[Session] = Depends(get_db),
+    current_user: User = Depends(require_permission("view_relocation_recommendations")),
+):
     """Get relocation recommendations for all habitations."""
     if is_database_available() and db:
         # For database mode, we'd need to compute from stored data
         # For now, fall back to computed recommendations
-        habitations = db.query(Habitation).all()
+        habitations = _scope_habitations(
+            [h.__dict__ for h in db.query(Habitation).all()], current_user
+        )
         hab_dicts = [
             {
-                "id": h.id,
-                "name": h.name,
-                "population": h.population,
-                "latitude": h.latitude,
-                "longitude": h.longitude,
-                "hazard_type": h.hazard_type.value if hasattr(h.hazard_type, 'value') else h.hazard_type,
-                "hazard_score": h.hazard_score,
-                "exposure_score": h.exposure_score,
-                "vulnerability_score": h.vulnerability_score,
-                "risk_score": h.risk_score,
-                "risk_level": h.risk_level.value if hasattr(h.risk_level, 'value') else h.risk_level,
+                "id": h["id"], "name": h["name"], "population": h["population"],
+                "latitude": h["latitude"], "longitude": h["longitude"],
+                "hazard_type": h["hazard_type"].value if hasattr(h["hazard_type"], 'value') else h["hazard_type"],
+                "hazard_score": h["hazard_score"], "exposure_score": h["exposure_score"],
+                "vulnerability_score": h["vulnerability_score"], "risk_score": h["risk_score"],
+                "risk_level": h["risk_level"].value if hasattr(h["risk_level"], 'value') else h["risk_level"],
             }
             for h in habitations
         ]
@@ -207,15 +220,30 @@ async def get_all_recommendations_endpoint(db: Optional[Session] = Depends(get_d
                 "environmental_status": c.environmental_status.value if hasattr(c.environmental_status, 'value') else c.environmental_status,
             }
     else:
-        hab_dicts = fallback_service.habitations
+        hab_dicts = _scope_habitations(fallback_service.habitations, current_user)
         site_dicts = fallback_service.relocation_sites
         cap_dict = {}
         for c in fallback_service.capacity_assessments:
             cap_dict[c["relocation_site_id"]] = c
     
+    # Build infrastructure lookup for all habitations
+    infra_lookup = {}
+    if is_database_available() and db:
+        infrastructure = db.query(Infrastructure).all()
+        for infra in infrastructure:
+            infra_lookup[infra.habitation_id] = {
+                "habitation_id": infra.habitation_id,
+                "road_connectivity": infra.road_connectivity,
+                "emergency_response_time": infra.emergency_response_time,
+            }
+    else:
+        for infra in fallback_service.infrastructure:
+            infra_lookup[infra["habitation_id"]] = infra
+    
     all_recommendations = []
     for hab in hab_dicts:
-        result = get_all_recommendations(hab, site_dicts, cap_dict)
+        infra = infra_lookup.get(hab.get("id"))
+        result = get_all_recommendations(hab, site_dicts, cap_dict, infrastructure=infra)
         all_recommendations.append(_convert_recommendation_result(result))
     
     return all_recommendations
@@ -227,24 +255,22 @@ async def list_relocation_priorities(
     risk_level: Optional[str] = Query(None),
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0),
-    db: Optional[Session] = Depends(get_db)
+    db: Optional[Session] = Depends(get_db),
+    current_user: User = Depends(require_permission("view_relocation_recommendations")),
 ):
     """List all relocation priorities with optional filtering."""
     if is_database_available() and db:
-        habitations = db.query(Habitation).all()
+        habitations = _scope_habitations(
+            [h.__dict__ for h in db.query(Habitation).all()], current_user
+        )
         hab_dicts = [
             {
-                "id": h.id,
-                "name": h.name,
-                "population": h.population,
-                "latitude": h.latitude,
-                "longitude": h.longitude,
-                "hazard_type": h.hazard_type.value if hasattr(h.hazard_type, 'value') else h.hazard_type,
-                "hazard_score": h.hazard_score,
-                "exposure_score": h.exposure_score,
-                "vulnerability_score": h.vulnerability_score,
-                "risk_score": h.risk_score,
-                "risk_level": h.risk_level.value if hasattr(h.risk_level, 'value') else h.risk_level,
+                "id": h["id"], "name": h["name"], "population": h["population"],
+                "latitude": h["latitude"], "longitude": h["longitude"],
+                "hazard_type": h["hazard_type"].value if hasattr(h["hazard_type"], 'value') else h["hazard_type"],
+                "hazard_score": h["hazard_score"], "exposure_score": h["exposure_score"],
+                "vulnerability_score": h["vulnerability_score"], "risk_score": h["risk_score"],
+                "risk_level": h["risk_level"].value if hasattr(h["risk_level"], 'value') else h["risk_level"],
             }
             for h in habitations
         ]
@@ -259,7 +285,7 @@ async def list_relocation_priorities(
         ]
         results = assess_all_priorities(hab_dicts, infra_dicts)
     else:
-        habitations = fallback_service.habitations
+        habitations = _scope_habitations(fallback_service.habitations, current_user)
         infrastructure = fallback_service.infrastructure
         results = assess_all_priorities(habitations, infrastructure)
     
@@ -287,8 +313,13 @@ async def list_relocation_priorities(
 
 
 @router.get("/{habitation_id}", response_model=RelocationPriorityResponse)
-async def get_relocation_priority(habitation_id: str, db: Optional[Session] = Depends(get_db)):
+async def get_relocation_priority(
+    habitation_id: str,
+    db: Optional[Session] = Depends(get_db),
+    current_user: User = Depends(require_permission("view_relocation_recommendations")),
+):
     """Get relocation priority for a specific habitation."""
+    require_assigned_habitation(habitation_id, current_user)
     if is_database_available() and db:
         hab = db.query(Habitation).filter(Habitation.id == habitation_id).first()
         if not hab:
@@ -330,8 +361,13 @@ async def get_relocation_priority(habitation_id: str, db: Optional[Session] = De
 
 
 @router.get("/{habitation_id}/recommendations", response_model=RelocationRecommendationResponse)
-async def get_relocation_recommendations(habitation_id: str, db: Optional[Session] = Depends(get_db)):
+async def get_relocation_recommendations(
+    habitation_id: str,
+    db: Optional[Session] = Depends(get_db),
+    current_user: User = Depends(require_permission("view_relocation_recommendations")),
+):
     """Get relocation site recommendations for a specific habitation."""
+    require_assigned_habitation(habitation_id, current_user)
     if is_database_available() and db:
         hab = db.query(Habitation).filter(Habitation.id == habitation_id).first()
         if not hab:
@@ -383,6 +419,15 @@ async def get_relocation_recommendations(habitation_id: str, db: Optional[Sessio
                 "sanitation_status": c.sanitation_status.value if hasattr(c.sanitation_status, 'value') else c.sanitation_status,
                 "environmental_status": c.environmental_status.value if hasattr(c.environmental_status, 'value') else c.environmental_status,
             }
+        
+        infra = db.query(Infrastructure).filter(Infrastructure.habitation_id == habitation_id).first()
+        infra_dict = None
+        if infra:
+            infra_dict = {
+                "habitation_id": infra.habitation_id,
+                "road_connectivity": infra.road_connectivity,
+                "emergency_response_time": infra.emergency_response_time,
+            }
     else:
         hab = fallback_service.get_habitation(habitation_id)
         if not hab:
@@ -393,6 +438,8 @@ async def get_relocation_recommendations(habitation_id: str, db: Optional[Sessio
         cap_dict = {}
         for c in fallback_service.capacity_assessments:
             cap_dict[c["relocation_site_id"]] = c
+        
+        infra = fallback_service.get_infrastructure_by_habitation(habitation_id)
     
-    result = get_all_recommendations(hab_dict, site_dicts, cap_dict)
+    result = get_all_recommendations(hab_dict, site_dicts, cap_dict, infrastructure=infra)
     return _convert_recommendation_result(result)

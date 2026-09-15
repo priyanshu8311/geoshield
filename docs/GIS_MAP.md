@@ -7,13 +7,15 @@ The GIS Map module (`/map`) provides an interactive geospatial visualization of 
 ## Architecture
 
 ### Technology Stack
+
 - **Leaflet 1.9.4** - Core mapping library
 - **React Leaflet 4.2.1** - React bindings for Leaflet
 - **OpenStreetMap** - Base map tile provider
 - **GeoJSON** - Vector data format for hazard polygons
 
 ### Component Structure
-```
+
+```text
 GISMap (page)
 ├── MapContainer (react-leaflet)
 │   ├── TileLayer (OpenStreetMap)
@@ -34,6 +36,7 @@ GISMap (page)
 ## OpenStreetMap Integration
 
 ### Base Layer Configuration
+
 ```typescript
 <TileLayer
   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -52,7 +55,7 @@ GISMap (page)
 The map consumes data from the following backend endpoints:
 
 | Layer | API Endpoint | Data Format |
-|-------|-------------|-------------|
+| --- | --- | --- |
 | Habitations | `GET /api/habitations` | Point geometries with risk attributes |
 | Hazard Zones | `GET /api/hazards` | MultiPolygon geometries with severity |
 | Relocation Sites | `GET /api/relocation-sites` | Point geometries with capacity data |
@@ -61,6 +64,7 @@ The map consumes data from the following backend endpoints:
 ### Data Models
 
 **Habitation** (Point geometry)
+
 - `id`, `name`, `district`, `state`, `population`
 - `latitude`, `longitude`, `geometry` (GeoJSON Point)
 - `hazard_type`: Landslide | Flood | Cloudburst | Coastal Erosion
@@ -68,11 +72,13 @@ The map consumes data from the following backend endpoints:
 - `relocation_priority`: P1 | P2 | P3 | P4
 
 **Hazard Zone** (MultiPolygon geometry)
+
 - `id`, `name`, `hazard_type`, `severity` (0-100)
 - `frequency`, `description`
 - `geometry` (GeoJSON MultiPolygon)
 
 **Relocation Site** (Point geometry)
+
 - `id`, `name`, `latitude`, `longitude`, `geometry` (GeoJSON Point)
 - `total_capacity`, `current_population`, `available_capacity`
 - Infrastructure capacities: water, housing, healthcare, school
@@ -80,6 +86,7 @@ The map consumes data from the following backend endpoints:
 - `environmental_status`
 
 **Infrastructure** (No native geometry - uses habitation coordinates)
+
 - `habitation_id` (foreign key)
 - Scores: roads, water, healthcare, schools, electricity, sanitation, emergency
 - Details: road_connectivity, water_source, healthcare_facilities, school_count
@@ -89,6 +96,7 @@ The map consumes data from the following backend endpoints:
 ## Map Layers
 
 ### 1. Habitation Markers
+
 - **Visualization**: Circle markers colored by risk level
 - **Colors**:
   - CRITICAL: `#dc2626` (red)
@@ -100,6 +108,7 @@ The map consumes data from the following backend endpoints:
 - **Click Action**: Opens DetailsPanel with full habitation info + linked infrastructure
 
 ### 2. Hazard Zones
+
 - **Visualization**: Polygon overlays with semi-transparent fill
 - **Colors by Hazard Type**:
   - Landslide: `#8b5e3c` (brown)
@@ -111,6 +120,7 @@ The map consumes data from the following backend endpoints:
 - **Click Action**: Opens DetailsPanel with hazard zone details
 
 ### 3. Relocation Site Markers
+
 - **Visualization**: Circle markers with white center dot, colored by utilization
 - **Utilization Colors**:
   - <40%: `#22c55e` (green - available)
@@ -121,6 +131,7 @@ The map consumes data from the following backend endpoints:
 - **Click Action**: Opens DetailsPanel with full site capacity breakdown
 
 ### 4. Infrastructure Markers
+
 - **Visualization**: Emoji icons offset from habitation location
 - **Types**: roads (🛣️), water (💧), healthcare (🏥), schools (🏫), electricity (⚡), sanitation (🚰), emergency (🚑)
 - **Note**: Infrastructure records lack native coordinates. Markers are placed at associated habitation coordinates with small offsets to prevent overlap.
@@ -130,6 +141,7 @@ The map consumes data from the following backend endpoints:
 ## Layer Control
 
 Independent toggle switches for each layer:
+
 - Habitations (default: on)
 - Hazard Zones (default: on)
 - Relocation Sites (default: on)
@@ -140,6 +152,7 @@ Located in right sidebar (desktop) or slide-out panel (mobile).
 ## Legend
 
 Professional legend in right sidebar showing:
+
 - **Risk Levels**: 5 colored circles with labels (Critical → Low)
 - **Hazard Severity**: 4 colored circles (Critical, High, Moderate, Low)
 - **Relocation Utilization**: 4 colored circles with center dots (Available → Critical)
@@ -147,18 +160,22 @@ Professional legend in right sidebar showing:
 ## Filters
 
 ### Risk Level Filter
+
 - Options: All, LOW, MODERATE, ELEVATED, HIGH, CRITICAL
 - Filters habitation markers
 
 ### Hazard Type Filter
+
 - Options: All, Landslide, Flood, Cloudburst, Coastal Erosion
 - Filters both habitation markers and hazard zone polygons
 
 ### Hazard Severity Filter
+
 - Options: All, Low, Moderate, High, Critical
 - Filters hazard zones by severity classification
 
 ### Habitation Status Filter
+
 - Options: All, Safe, Monitor, At Risk, Red Zone, Relocation Required
 - Derived from risk level mapping
 
@@ -167,11 +184,13 @@ All filters combine with AND logic and update visible features in real-time.
 ## Search
 
 Search control in top-left overlay supports:
+
 - Habitation names and IDs
 - Hazard zone names and IDs
 - Relocation site names and IDs
 
 Selecting a result:
+
 1. Sets search query (applies filters)
 2. Flies map to feature location (zoom 13 for points, zoom 11 for hazards)
 3. Opens DetailsPanel for the feature
@@ -193,6 +212,7 @@ Close button returns to map view.
 ## Map Statistics
 
 Compact dashboard in sidebar showing real-time counts:
+
 - Total Habitations (filtered)
 - Red Zones (CRITICAL risk)
 - High/Critical Risk count
@@ -224,7 +244,7 @@ Values derived from currently filtered data, not raw totals.
 ## Responsive Design
 
 | Breakpoint | Layout |
-|------------|--------|
+| --- | --- |
 | Desktop (≥1024px) | Map left (calc(100%-360px)), Sidebar right (360px fixed) |
 | Tablet (768-1023px) | Map full width, sidebar as slide-over panel |
 | Mobile (<768px) | Map full height, controls as bottom sheets, sidebar as right slide-over |
@@ -234,6 +254,7 @@ Map controls (search, filters) collapse into bottom sheets on mobile. Details pa
 ## Demo Data Disclaimer
 
 Prominently displayed in two locations:
+
 1. Bottom-left of map (desktop) / bottom sheet (mobile)
 2. In mobile controls panel
 
@@ -251,21 +272,16 @@ Styled with amber background for visibility.
 ## Limitations
 
 1. **Infrastructure Coordinates**: Infrastructure records lack native geographic coordinates. Markers are synthesized from associated habitation locations with artificial offsets. This is a data limitation, not a code limitation.
-
 2. **Hazard Geometry Bounds**: Search zoom for hazard zones uses a default center since polygon bounds calculation not implemented.
-
 3. **Marker Clustering**: No marker clustering for habitations at high density (acceptable for 20 demo records).
-
 4. **Real-time Updates**: Data loaded once on mount; no WebSocket/polling for live updates.
-
 5. **Print/Export**: No map print or image export functionality.
-
 6. **Measure/Draw Tools**: No distance/area measurement or drawing tools.
 
 ## Future Production GIS Integrations
 
 | Feature | Description |
-|---------|-------------|
+| --- | --- |
 | WMS/WMTS Layers | Overlay official hazard maps from government WMS services |
 | Vector Tiles | High-performance rendering for large datasets (Mapbox/MapLibre) |
 | Clustering | Marker clustering for 1000+ habitations |
@@ -279,7 +295,7 @@ Styled with amber background for visibility.
 
 ## File Structure
 
-```
+```text
 frontend/src/pages/GISMap.tsx          # Main map component (1200+ lines)
 frontend/src/services/api.ts           # API types & fetch functions
 frontend/src/components/Icons.tsx      # RiskBadge, MapIcon, etc.
